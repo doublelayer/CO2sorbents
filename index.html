@@ -3,216 +3,345 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CO₂ Sorbents 3D Plot</title>
+<title>CO₂ sorbents 3D plot</title>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.35.2/plotly.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
   body {
-    font-family: Arial, sans-serif;
-    background: #111;
-    color: #eee;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     min-height: 100vh;
     padding: 1rem;
+    background: #111;
+    color: #eee;
+    font-family: Arial, sans-serif;
   }
+
   h1 {
-    font-size: 1.2rem;
-    font-weight: 500;
     margin-bottom: 1rem;
     color: #ddd;
+    font-size: 1.2rem;
+    font-weight: 500;
     text-align: center;
   }
-  #controls {
+
+  #layout {
     display: flex;
-    align-items: center;
+    width: 100%;
+    max-width: 1400px;
+    height: calc(100vh - 4.5rem);
+    margin: 0 auto;
     gap: 16px;
-    margin-bottom: 1rem;
+  }
+
+  #plot {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 500px;
+  }
+
+  #sidepanel {
+    flex: 0 0 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: fit-content;
+    padding: 1rem;
     background: #1e1e1e;
     border: 1px solid #333;
     border-radius: 8px;
-    padding: 0.75rem 1.25rem;
   }
-  #controls label { font-size: 14px; color: #aaa; }
+
+  #controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .control-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #controls label,
+  .control-row label {
+    color: #aaa;
+    font-size: 14px;
+  }
+
   #price-slider {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 220px;
+    width: 100%;
     height: 4px;
     background: #444;
     border-radius: 2px;
     outline: none;
     cursor: pointer;
-  }
-  #price-slider::-webkit-slider-thumb {
+    appearance: none;
     -webkit-appearance: none;
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: #4caf50;
-    cursor: pointer;
   }
+
+  #price-slider::-webkit-slider-thumb {
+    width: 18px;
+    height: 18px;
+    background: #4caf50;
+    border-radius: 50%;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
   #price-val {
+    min-width: 80px;
+    color: #4caf50;
     font-size: 15px;
     font-weight: 600;
-    min-width: 60px;
-    color: #4caf50;
   }
+
   #include-mat {
+    width: 16px;
+    height: 16px;
     accent-color: #4caf50;
-    width: 16px; height: 16px;
     cursor: pointer;
   }
-  #plot { width: min(100vw, 1000px); height: min(100vw, 1000px); }
+
   #status {
-    font-size: 13px;
-    color: #888;
     margin-top: 0.5rem;
+    color: #888;
+    font-size: 13px;
   }
 </style>
 </head>
 <body>
 
-<h1>CO₂ Sorbents — 3D Performance &amp; Cost Map</h1>
+<h1>Parameters of CO<sub>2</sub> capture process for selected sorbents and conditions</h1>
 
-<div id="controls">
-  <label for="price-slider">Electricity price:</label>
-  <input type="range" id="price-slider" min="0.05" max="0.80" step="0.01" value="0.20">
-  <span id="price-val">0.20 €/kWh</span>
-  <label for="include-mat" style="margin-left:12px;">Include material cost</label>
-  <input type="checkbox" id="include-mat" checked>
+<div id="layout">
+  <div id="plot"></div>
+  <div id="sidepanel">
+    <div id="controls">
+      <label for="price-slider">Electricity price:</label>
+      <input type="range" id="price-slider" min="0.05" max="0.80" step="0.01" value="0.20">
+      <span id="price-val">0.20 €/kWh</span>
+    </div>
+    <div class="control-row">
+      <label for="include-mat">Include material cost</label>
+      <input type="checkbox" id="include-mat" checked>
+    </div>
+    <div id="status">Loading data…</div>
+  </div>
 </div>
-
-<div id="plot"></div>
-<div id="status">Loading data…</div>
 
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSrocYVch0p6yXg-tc6RrSRPpx1v1POsZT9gfKeCPJ5wKCNRD40LxtIlI3llEtRY1WdJpSSs5T7D1kG/pub?gid=159971136&single=true&output=csv";
 
-const EXCLUDE = [
-  "Sodium Borate (Na2B4O3)",
-  "Co(salen)-based porous ionic polymer",
-  "QD–FAU 13X-SiQDs zeolite "
-];
+const MODEL = {
+  priceKJPerKWh: 1 / 3600,
+  molarMassCO2GramPerMol: 44.0095,
+  gramsPerTon: 1e6,
+  sorbentMassKg: 1.0,
+  cyclesScaleFactor: 10,
+  maxEnergyCostEUR: 1e12,
+};
 
-function parseNum(v, strip=[]) {
-  let s = String(v ?? "");
-  for (const r of strip) s = s.split(r).join("");
-  s = s.trim();
-  const n = parseFloat(s);
-  return isNaN(n) ? null : n;
+const MARKER = {
+  capacitySizeScale: 5,
+  minSize: 4,
+  maxSize: 40,
+  opacity: 0.9,
+};
+
+const COLORBAR = {
+  maxTimeMin: 100,
+  tickValuesMin: [1, 2, 5, 10, 20, 50, 100, 500],
+};
+
+const AXIS = {
+  xLogRange: [2, 3.699],
+  xTickVals: [
+    1e2, 2e2, 3e2, 4e2, 5e2, 6e2, 7e2, 8e2, 9e2,
+    1e3, 2e3, 3e3, 4e3, 5e3
+  ],
+  xTickText: ["10²", "", "", "", "", "", "", "", "", "10³", "", "", "", ""],
+  zRange: [0, 300],
+};
+
+const CAMERA = {
+  eye: { x: 1.6, y: -1.6, z: 0.4 },
+};
+
+function parseNum(value, stringsToRemove = []) {
+  let text = String(value ?? "");
+  for (const item of stringsToRemove) {
+    text = text.split(item).join("");
+  }
+  const number = parseFloat(text.trim());
+  return Number.isNaN(number) ? null : number;
 }
 
-function parseKinetics(v) {
-  if (v === null || v === undefined) return null;
-  const s = String(v).trim().toLowerCase();
-  if (/^[0-9]*\.?[0-9]+$/.test(s)) return parseFloat(s);
-  if (s.startsWith("k1a") || s.startsWith("kapp")) {
-    const m = s.match(/([0-9]*\.?[0-9]+)\s*(k)?/);
-    if (!m) return null;
-    let k = parseFloat(m[1]);
-    if (m[2]) k *= 1000;
-    return k > 0 ? (2.3026 / k) / 60 : null;
+function parseKinetics(value) {
+  if (value === null || value === undefined) return null;
+
+  const text = String(value).trim().toLowerCase();
+  const directNumber = Number(text);
+  if (!Number.isNaN(directNumber)) return directNumber;
+
+  if (text.startsWith("k1a") || text.startsWith("kapp")) {
+    const match = text.match(/[0-9]+([.][0-9]+)?[ ]*(k)?/);
+    if (!match) return null;
+
+    let rateConstant = parseFloat(match[0]);
+    if (match[2]) rateConstant *= 1000;
+
+    return rateConstant > 0 ? (2.3026 / rateConstant) / 60 : null;
   }
+
   return null;
 }
 
 function parseCSV(text) {
-  const lines = text.split(/\r?\n/);
-  const header = lines[0].split(",").map(h => h.trim().replace(/^"|"$/g, ""));
-  const rows = [];
-  for (let i = 1; i < lines.length; i++) {
-    if (!lines[i].trim()) continue;
-    // simple CSV parse (handles quoted fields)
-    const cols = [];
-    let cur = "", inQ = false;
-    for (const ch of lines[i]) {
-      if (ch === '"') { inQ = !inQ; continue; }
-      if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ""; }
-      else cur += ch;
-    }
-    cols.push(cur.trim());
-    const row = {};
-    header.forEach((h, j) => row[h] = cols[j] ?? "");
-    rows.push(row);
+  const result = Papa.parse(text, {
+    header: true,
+    dynamicTyping: false,
+    skipEmptyLines: true,
+  });
+
+  if (result.errors.length > 0) {
+    throw new Error(result.errors[0].message);
   }
-  return rows;
+
+  return result.data;
 }
 
 function cleanData(rows) {
-  // Drop index row 0 (the first data row is often a units row based on the Python notebook)
-  rows = rows.slice(1);
-
   return rows
-    .map(r => {
-      const rh  = parseNum(r["Reaction Enthalpy"], ["kJ/mol"]);
-      const cap = parseNum(r["Maximum Capacity"], ["mol/kg"]);
-      const cost= parseNum(r["Sorbent Cost"], ["$", "/kg"]);
-      const kin = parseNum(r["Reaction Kinetics"]);
-      const kin2= parseKinetics(r["Reaction Kinetics"]);
-      const cap_temp = parseNum(r["Capture temperature"]);
+    .map(row => {
+      const reactionEnthalpyKJPerMol = parseNum(row["Reaction Enthalpy"], ["kJ/mol"]);
+      const maximumCapacityMolPerKg = parseNum(row["Maximum Capacity"], ["mol/kg"]);
+      const sorbentCostEURPerKg = parseNum(row["Sorbent Cost"], ["$", "/kg"]);
+      const reactionKineticsMin = parseNum(row["Reaction Kinetics"]);
+      const reactionKineticsParsedMin = parseKinetics(row["Reaction Kinetics"]);
+      const captureTemperature = parseNum(row["Capture temperature"]);
+
       return {
-        name:    r["Sorbent name"]?.trim() ?? "",
-        rh, cap, cost, kin, kin2, cap_temp,
-        maxCycles: parseNum(r["Maximum Cycles"]),
-        transferability: parseNum(r["Transferability"]),
+        name: row["Sorbent name"]?.trim() ?? "",
+        reactionEnthalpyKJPerMol,
+        maximumCapacityMolPerKg,
+        sorbentCostEURPerKg,
+        reactionKineticsMin,
+        reactionKineticsParsedMin,
+        captureTemperature,
+        maxCycles: parseNum(row["Maximum Cycles"]),
+        transferability: parseNum(row["Transferability"]),
       };
     })
-    .filter(r =>
-      r.rh !== null && r.cap !== null && r.kin !== null &&
-      r.cost !== null && r.cap_temp !== null &&
-      !EXCLUDE.includes(r.name) && r.name !== ""
+    .filter(row =>
+      row.name !== "" &&
+      row.reactionEnthalpyKJPerMol !== null &&
+      row.maximumCapacityMolPerKg !== null &&
+      row.sorbentCostEURPerKg !== null &&
+      row.reactionKineticsMin !== null &&
+      row.captureTemperature !== null
     );
 }
 
 function computeModel(data, priceKWh, includeMaterial) {
-  const priceKJ = priceKWh / 3600;
-  const M_CO2 = 44.0095;
-  const mass = 1.0;
+  const priceEURPerKJ = priceKWh * MODEL.priceKJPerKWh;
 
-  return data.map(r => {
-    const cycles   = (1e6 / M_CO2 / r.cap / mass) / 10;
-    const energy   = (1e6 / M_CO2 * r.rh) / 1e6;
-    const energyCost = energy * 1e6 * priceKJ;
-    const matCost  = includeMaterial ? (mass * r.cost / cycles) : 0;
-    const price    = Math.max(energyCost, 0) + matCost;
-    const logTime  = r.kin !== null ? Math.log10(Math.max(r.kin, 0.001)) : null;
-    return { ...r, cycles, energy, price, logTime };
-  }).filter(r => r.logTime !== null && isFinite(r.price) && r.price >= 0);
+  return data
+    .map(row => {
+      const cyclesPerTonRaw = MODEL.gramsPerTon /
+        MODEL.molarMassCO2GramPerMol /
+        row.maximumCapacityMolPerKg /
+        MODEL.sorbentMassKg;
+      const cyclesPerTon = cyclesPerTonRaw / MODEL.cyclesScaleFactor;
+
+      const energyKJPerTon = MODEL.gramsPerTon /
+        MODEL.molarMassCO2GramPerMol *
+        row.reactionEnthalpyKJPerMol;
+      const energyGJPerTon = energyKJPerTon / 1e6;
+      const energyCostPerTon = energyKJPerTon * priceEURPerKJ;
+
+      const materialCost = MODEL.sorbentMassKg * row.sorbentCostEURPerKg;
+      const materialCostPerTon = includeMaterial ? materialCost / cyclesPerTon : 0;
+      const clippedEnergyCostPerTon = Math.min(
+        Math.max(energyCostPerTon, 0),
+        MODEL.maxEnergyCostEUR
+      );
+      const totalCostPerTon = clippedEnergyCostPerTon + materialCostPerTon;
+
+      const timeSorpMin = row.reactionKineticsMin;
+      const logTimeSorp = timeSorpMin > 0 ? Math.log10(timeSorpMin) : null;
+
+      return {
+        ...row,
+        cyclesPerTon,
+        energyGJPerTon,
+        totalCostPerTon,
+        timeSorpMin,
+        logTimeSorp,
+      };
+    })
+    .filter(row =>
+      row.logTimeSorp !== null &&
+      Number.isFinite(row.totalCostPerTon) &&
+      row.totalCostPerTon >= 0
+    );
 }
 
-function makeFigure(pts) {
-  const names  = pts.map(p => p.name);
-  const xs     = pts.map(p => p.cycles);
-  const ys     = pts.map(p => p.energy);
-  const zs     = pts.map(p => p.price);
-  const colors = pts.map(p => p.logTime);
-  const sizes  = pts.map(p => Math.max(4, Math.min(40, p.cap * 10)));
+function getPlotSize() {
+  const plot = document.getElementById("plot");
+  const rect = plot.getBoundingClientRect();
+  const size = Math.floor(Math.min(rect.width, rect.height));
 
-  const minLog = Math.min(...colors);
-  const maxLog = Math.log10(100);
+  return {
+    width: Math.max(size, 400),
+    height: Math.max(size, 400),
+  };
+}
 
-  const tickValsReal = [1,2,5,10,20,50,100,500];
-  const tickValsLog  = tickValsReal.map(v => Math.log10(v));
-  const tickText     = tickValsReal.map(String);
+function makeFigure(points) {
+  const names = points.map(point => point.name);
+  const xs = points.map(point => point.cyclesPerTon);
+  const ys = points.map(point => point.energyGJPerTon);
+  const zs = points.map(point => point.totalCostPerTon);
+  const colors = points.map(point => point.logTimeSorp);
+  const sizes = points.map(point =>
+    Math.max(
+      MARKER.minSize,
+      Math.min(MARKER.maxSize, point.maximumCapacityMolPerKg * MARKER.capacitySizeScale)
+    )
+  );
+
+  const minLogTime = Math.min(...colors);
+  const maxLogTime = Math.log10(COLORBAR.maxTimeMin);
+  const colorbarTickValues = COLORBAR.tickValuesMin.map(value => Math.log10(value));
+  const colorbarTickText = COLORBAR.tickValuesMin.map(String);
+  const plotSize = getPlotSize();
 
   const trace = {
     type: "scatter3d",
     mode: "markers",
-    x: xs, y: ys, z: zs,
+    x: xs,
+    y: ys,
+    z: zs,
     text: names,
-    hovertemplate: "<b>%{text}</b><br>Cycles: %{x:.0f}<br>Energy: %{y:.2f} GJ/t<br>Cost: €%{z:.1f}/t<extra></extra>",
+    hovertemplate: "<b>%{text}</b><br>Cycles per 10 kg sorbent per ton CO<sub>2</sub>: %{x:.0f}<br>Energy: %{y:.2f} GJ/t<br>Cost: €%{z:.1f}/t<extra></extra>",
     marker: {
       size: sizes,
       color: colors,
       colorscale: "RdYlGn",
       reversescale: true,
-      cmin: minLog,
-      cmax: maxLog,
+      cmin: minLogTime,
+      cmax: maxLogTime,
       colorbar: {
         title: { text: "Time, min", side: "right" },
-        tickvals: tickValsLog,
-        ticktext: tickText,
+        tickvals: colorbarTickValues,
+        ticktext: colorbarTickText,
         x: 0.92,
         y: 0.5,
         len: 0.5,
@@ -220,27 +349,29 @@ function makeFigure(pts) {
         tickfont: { color: "#ddd", size: 13 },
         titlefont: { color: "#ddd", size: 14 },
       },
-      opacity: 0.9,
-      line: { width: 0.5, color: "#fff" }
-    }
+      opacity: MARKER.opacity,
+      line: { width: 0.5, color: "#fff" },
+    },
   };
 
   const layout = {
     paper_bgcolor: "#111",
-    plot_bgcolor:  "#111",
+    plot_bgcolor: "#111",
     font: { color: "#ddd", size: 14, family: "Arial" },
     margin: { l: 0, r: 0, t: 30, b: 0 },
+    width: plotSize.width,
+    height: plotSize.height,
     scene: {
       bgcolor: "#111",
       aspectmode: "cube",
       domain: { x: [0, 0.88], y: [0, 1] },
       xaxis: {
-        title: { text: "Cycles per 10 kg sorbent per ton CO₂", font: { size: 14 } },
+        title: { text: "Cycles per 10 kg sorbent per ton CO<sub>2</sub>", font: { size: 14 } },
         type: "log",
-        range: [2, 3.699],
+        range: AXIS.xLogRange,
         tickmode: "array",
-        tickvals: [1e2,2e2,3e2,4e2,5e2,6e2,7e2,8e2,9e2,1e3,2e3,3e3,4e3,5e3],
-        ticktext: ["10²","","","","","","","","","10³","","","",""],
+        tickvals: AXIS.xTickVals,
+        ticktext: AXIS.xTickText,
         showbackground: true,
         backgroundcolor: "#1a1a1a",
         gridcolor: "#444",
@@ -249,7 +380,7 @@ function makeFigure(pts) {
         titlefont: { color: "#ccc", size: 14 },
       },
       yaxis: {
-        title: { text: "Energy (GJ per ton CO₂)", font: { size: 14 } },
+        title: { text: "Energy (GJ per ton CO<sub>2</sub>)", font: { size: 14 } },
         showbackground: true,
         backgroundcolor: "#1a1a1a",
         gridcolor: "#444",
@@ -259,8 +390,8 @@ function makeFigure(pts) {
         dtick: 2,
       },
       zaxis: {
-        title: { text: "Cost (€ per ton CO₂)", font: { size: 14 } },
-        range: [0, 300],
+        title: { text: "Cost (€ per ton CO<sub>2</sub>)", font: { size: 14 } },
+        range: AXIS.zRange,
         showbackground: true,
         backgroundcolor: "#1a1a1a",
         gridcolor: "#444",
@@ -268,11 +399,9 @@ function makeFigure(pts) {
         tickfont: { color: "#ccc", size: 12 },
         titlefont: { color: "#ccc", size: 14 },
         dtick: 50,
-      }
+      },
     },
-    scene_camera: { eye: { x: 1.6, y: -1.6, z: 0.4 } },
-    width: Math.min(window.innerWidth, 1000),
-    height: Math.min(window.innerWidth, 1000),
+    scene_camera: CAMERA,
   };
 
   return { trace, layout };
@@ -282,42 +411,52 @@ let globalData = null;
 
 async function loadData() {
   const status = document.getElementById("status");
+
   try {
-    const res = await fetch(CSV_URL);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const text = await res.text();
+    const response = await fetch(CSV_URL);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const text = await response.text();
     const rows = parseCSV(text);
     globalData = cleanData(rows);
+
     status.textContent = `Loaded ${globalData.length} sorbents.`;
     render();
-  } catch(e) {
-    status.textContent = "Error loading data: " + e.message;
-    console.error(e);
+  } catch (error) {
+    status.textContent = "Error loading data: " + error.message;
+    console.error(error);
   }
 }
 
 function render() {
   if (!globalData) return;
-  const price = parseFloat(document.getElementById("price-slider").value);
-  const incMat = document.getElementById("include-mat").checked;
-  document.getElementById("price-val").textContent = price.toFixed(2) + " €/kWh";
-  const pts = computeModel(globalData, price, incMat);
-  const { trace, layout } = makeFigure(pts);
-  Plotly.react("plot", [trace], layout, { responsive: true, displayModeBar: true });
+
+  const priceSlider = document.getElementById("price-slider");
+  const priceValue = document.getElementById("price-val");
+  const includeMaterial = document.getElementById("include-mat").checked;
+  const priceKWh = parseFloat(priceSlider.value);
+
+  priceValue.textContent = priceKWh.toFixed(2) + " €/kWh";
+
+  const points = computeModel(globalData, priceKWh, includeMaterial);
+  const { trace, layout } = makeFigure(points);
+
+  Plotly.react("plot", [trace], layout, {
+    responsive: true,
+    displayModeBar: true,
+  });
 }
 
-document.getElementById("price-slider").addEventListener("input", () => {
-  document.getElementById("price-val").textContent =
-    parseFloat(document.getElementById("price-slider").value).toFixed(2) + " €/kWh";
-  render();
-});
-document.getElementById("include-mat").addEventListener("change", render);
-
-window.addEventListener("resize", () => {
+function resizePlot() {
   if (!globalData) return;
-  const sz = Math.min(window.innerWidth, 1000);
-  Plotly.relayout("plot", { width: sz, height: sz });
-});
+
+  const plotSize = getPlotSize();
+  Plotly.relayout("plot", plotSize);
+}
+
+document.getElementById("price-slider").addEventListener("input", render);
+document.getElementById("include-mat").addEventListener("change", render);
+window.addEventListener("resize", resizePlot);
 
 loadData();
 </script>
