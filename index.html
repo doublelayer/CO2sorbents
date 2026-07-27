@@ -7,6 +7,18 @@
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.35.2/plotly.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <style>
+  :root {
+    color-scheme: dark;
+    --bg: #111;
+    --panel: #1e1e1e;
+    --panel-light: #252525;
+    --border: #383838;
+    --muted: #aaa;
+    --text: #eee;
+    --accent: #65c76f;
+    --accent-dark: #173d1d;
+  }
+
   * {
     box-sizing: border-box;
     margin: 0;
@@ -16,43 +28,55 @@
   body {
     min-height: 100vh;
     padding: 1rem;
-    background: #111;
-    color: #eee;
+    background: var(--bg);
+    color: var(--text);
     font-family: Arial, sans-serif;
   }
 
   h1 {
-    margin-bottom: 1rem;
+    margin-bottom: 0.35rem;
     color: #ddd;
-    font-size: 1.2rem;
+    font-size: 1.35rem;
     font-weight: 500;
     text-align: center;
+  }
+
+  .subtitle {
+    margin-bottom: 1rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  main {
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
   }
 
   #layout {
     display: flex;
     width: 100%;
-    max-width: 1400px;
-    height: calc(100vh - 4.5rem);
-    margin: 0 auto;
+    min-height: 620px;
     gap: 16px;
   }
 
   #plot {
     flex: 1 1 auto;
     min-width: 0;
-    min-height: 500px;
+    height: min(720px, calc(100vh - 8rem));
+    min-height: 540px;
   }
 
   #sidepanel {
-    flex: 0 0 320px;
+    flex: 0 0 360px;
     display: flex;
     flex-direction: column;
     gap: 12px;
     height: fit-content;
     padding: 1rem;
-    background: #1e1e1e;
-    border: 1px solid #333;
+    background: var(--panel);
+    border: 1px solid var(--border);
     border-radius: 8px;
   }
 
@@ -70,7 +94,7 @@
 
   #controls label,
   .control-row label {
-    color: #aaa;
+    color: var(--muted);
     font-size: 14px;
   }
 
@@ -88,7 +112,7 @@
   #price-slider::-webkit-slider-thumb {
     width: 18px;
     height: 18px;
-    background: #4caf50;
+    background: var(--accent);
     border-radius: 50%;
     cursor: pointer;
     appearance: none;
@@ -105,36 +129,462 @@
   #include-mat {
     width: 16px;
     height: 16px;
-    accent-color: #4caf50;
+    accent-color: var(--accent);
     cursor: pointer;
   }
 
   #status {
     margin-top: 0.5rem;
-    color: #888;
+    color: var(--muted);
     font-size: 13px;
+    line-height: 1.45;
+  }
+
+  #explorer {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .section-heading {
+    margin-bottom: 0.35rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+  }
+
+  .section-description {
+    margin-bottom: 1rem;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  #filters {
+    display: grid;
+    grid-template-columns: minmax(220px, 2fr) minmax(170px, 1fr) minmax(220px, 1.5fr) auto;
+    align-items: end;
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .filter-control {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .filter-control label {
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+
+  input[type="search"],
+  input[type="text"],
+  select,
+  button {
+    min-height: 38px;
+    padding: 0.5rem 0.65rem;
+    color: var(--text);
+    background: #181818;
+    border: 1px solid #494949;
+    border-radius: 5px;
+    font: inherit;
+  }
+
+  input[type="search"]:focus,
+  input[type="text"]:focus,
+  select:focus,
+  button:focus-visible {
+    border-color: var(--accent);
+    outline: 2px solid var(--accent-dark);
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #303030;
+  }
+
+  #plot-options {
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--border);
+  }
+
+  #plot-options summary {
+    color: #ccc;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .mapping-grid {
+    display: grid;
+    gap: 9px;
+    margin-top: 0.75rem;
+  }
+
+  .mapping-control {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mapping-control label {
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+
+  .mapping-control select,
+  .mapping-control input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  #result-summary {
+    margin-bottom: 0.65rem;
+    color: var(--muted);
+    font-size: 0.84rem;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+
+  table {
+    width: 100%;
+    min-width: 1100px;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+  }
+
+  th,
+  td {
+    padding: 0.65rem 0.7rem;
+    border-bottom: 1px solid #343434;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    color: #ccc;
+    background: var(--panel-light);
+    white-space: nowrap;
+  }
+
+  th button {
+    min-height: auto;
+    padding: 0;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    font-weight: 600;
+  }
+
+  th button:hover {
+    color: white;
+    background: transparent;
+  }
+
+  tbody tr:hover {
+    background: #242424;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .name-cell {
+    min-width: 210px;
+    font-weight: 600;
+  }
+
+  .method-cell {
+    min-width: 220px;
+  }
+
+  .empty-value {
+    color: #777;
+  }
+
+  .details-button {
+    min-height: 30px;
+    padding: 0.3rem 0.55rem;
+    color: var(--accent);
+  }
+
+  #pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 0.8rem;
+  }
+
+  .page-size-control {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-right: auto;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  #page-size {
+    min-height: 34px;
+    padding: 0.3rem 0.5rem;
+  }
+
+  #page-info {
+    min-width: 110px;
+    color: var(--muted);
+    font-size: 0.82rem;
+    text-align: center;
+  }
+
+  #pagination button:disabled {
+    color: #666;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  dialog {
+    width: min(760px, calc(100vw - 2rem));
+    max-height: calc(100vh - 2rem);
+    margin: auto;
+    padding: 0;
+    color: var(--text);
+    background: var(--panel);
+    border: 1px solid #555;
+    border-radius: 8px;
+  }
+
+  dialog::backdrop {
+    background: rgb(0 0 0 / 0.72);
+  }
+
+  .dialog-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--panel-light);
+    border-bottom: 1px solid var(--border);
+  }
+
+  #detail-title {
+    font-size: 1.05rem;
+  }
+
+  #close-dialog {
+    min-width: 38px;
+    padding: 0.25rem;
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  #detail-fields {
+    display: grid;
+    grid-template-columns: minmax(160px, 0.8fr) minmax(220px, 2fr);
+    padding: 1rem;
+  }
+
+  #detail-fields dt,
+  #detail-fields dd {
+    padding: 0.55rem;
+    border-bottom: 1px solid #343434;
+    overflow-wrap: anywhere;
+  }
+
+  #detail-fields dt {
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  #detail-fields dd a {
+    color: #8fcaef;
+  }
+
+  @media (max-width: 900px) {
+    #layout {
+      flex-direction: column;
+    }
+
+    #plot {
+      width: 100%;
+      height: 560px;
+      min-height: 500px;
+    }
+
+    #sidepanel {
+      flex-basis: auto;
+      width: 100%;
+    }
+
+    #filters {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    body {
+      padding: 0.65rem;
+    }
+
+    #filters {
+      grid-template-columns: 1fr;
+    }
+
+    #plot {
+      height: 480px;
+      min-height: 440px;
+    }
+
+    #detail-fields {
+      grid-template-columns: 1fr;
+    }
+
+    #detail-fields dt {
+      padding-bottom: 0.1rem;
+      border-bottom: 0;
+    }
+
+    #detail-fields dd {
+      padding-top: 0.1rem;
+    }
   }
 </style>
 </head>
 <body>
 
 <h1>Parameters of CO<sub>2</sub> capture process for selected sorbents and conditions</h1>
+<p class="subtitle">Compare modeled performance and inspect every record in the source dataset.</p>
 
-<div id="layout">
-  <div id="plot"></div>
-  <div id="sidepanel">
-    <div id="controls">
-      <label for="price-slider">Electricity price:</label>
-      <input type="range" id="price-slider" min="0.05" max="0.80" step="0.01" value="0.20">
-      <span id="price-val">0.20 €/kWh</span>
+<main>
+  <div id="layout">
+    <div id="plot" aria-label="Interactive 3D plot of filtered sorbents"></div>
+    <div id="sidepanel">
+      <div id="controls">
+        <label for="price-slider">Electricity price:</label>
+        <input type="range" id="price-slider" min="0.05" max="0.80" step="0.01" value="0.20">
+        <span id="price-val">0.20 €/kWh</span>
+      </div>
+      <div class="control-row">
+        <label for="include-mat">Include material cost</label>
+        <input type="checkbox" id="include-mat" checked>
+      </div>
+      <details id="plot-options" open>
+        <summary>Plot mappings</summary>
+        <div class="mapping-grid">
+          <div class="mapping-control">
+            <label for="x-parameter">X axis</label>
+            <select id="x-parameter"></select>
+          </div>
+          <div class="mapping-control">
+            <label for="x-title">X axis name</label>
+            <input type="text" id="x-title">
+          </div>
+          <div class="mapping-control">
+            <label for="y-parameter">Y axis</label>
+            <select id="y-parameter"></select>
+          </div>
+          <div class="mapping-control">
+            <label for="y-title">Y axis name</label>
+            <input type="text" id="y-title">
+          </div>
+          <div class="mapping-control">
+            <label for="z-parameter">Z axis</label>
+            <select id="z-parameter"></select>
+          </div>
+          <div class="mapping-control">
+            <label for="z-title">Z axis name</label>
+            <input type="text" id="z-title">
+          </div>
+          <div class="mapping-control">
+            <label for="size-parameter">Marker size</label>
+            <select id="size-parameter"></select>
+          </div>
+          <div class="mapping-control">
+            <label for="color-parameter">Marker color</label>
+            <select id="color-parameter"></select>
+          </div>
+        </div>
+      </details>
+      <div id="status" role="status" aria-live="polite">Loading data…</div>
     </div>
-    <div class="control-row">
-      <label for="include-mat">Include material cost</label>
-      <input type="checkbox" id="include-mat" checked>
-    </div>
-    <div id="status">Loading data…</div>
   </div>
-</div>
+
+  <section id="explorer" aria-labelledby="explorer-title">
+    <h2 id="explorer-title" class="section-heading">Explore the complete dataset</h2>
+    <p class="section-description">Search and filter every named sorbent, including records without enough data for the 3D model. Select “View” to inspect all source fields.</p>
+
+    <div id="filters">
+      <div class="filter-control">
+        <label for="search-input">Search all fields</label>
+        <input type="search" id="search-input" placeholder="Name, property, reference, comment…">
+      </div>
+      <div class="filter-control">
+        <label for="category-filter">Sorbent category</label>
+        <select id="category-filter">
+          <option value="">All categories</option>
+        </select>
+      </div>
+      <div class="filter-control">
+        <label for="method-filter">Capture method</label>
+        <select id="method-filter">
+          <option value="">All methods</option>
+        </select>
+      </div>
+      <button type="button" id="reset-filters">Reset filters</button>
+    </div>
+
+    <p id="result-summary" aria-live="polite"></p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr id="table-head"></tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+
+    <nav id="pagination" aria-label="Dataset pages">
+      <div class="page-size-control">
+        <label for="page-size">Rows per page</label>
+        <select id="page-size">
+          <option value="15">15</option>
+          <option value="30">30</option>
+          <option value="60">60</option>
+          <option value="all">All</option>
+        </select>
+      </div>
+      <button type="button" id="previous-page">Previous</button>
+      <span id="page-info"></span>
+      <button type="button" id="next-page">Next</button>
+    </nav>
+  </section>
+</main>
+
+<dialog id="detail-dialog" aria-labelledby="detail-title">
+  <div class="dialog-header">
+    <h2 id="detail-title">Sorbent details</h2>
+    <button type="button" id="close-dialog" aria-label="Close details">×</button>
+  </div>
+  <dl id="detail-fields"></dl>
+</dialog>
 
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSrocYVch0p6yXg-tc6RrSRPpx1v1POsZT9gfKeCPJ5wKCNRD40LxtIlI3llEtRY1WdJpSSs5T7D1kG/pub?gid=159971136&single=true&output=csv";
@@ -149,7 +599,6 @@ const MODEL = {
 };
 
 const MARKER = {
-  capacitySizeScale: 5,
   minSize: 4,
   maxSize: 40,
   opacity: 0.9,
@@ -172,6 +621,78 @@ const AXIS = {
 
 const CAMERA = {
   eye: { x: 1.6, y: -1.6, z: 0.4 },
+};
+
+const TABLE_COLUMNS = [
+  { key: "Sorbent name", label: "Sorbent name", className: "name-cell" },
+  { key: "Sorbent category", label: "Category" },
+  { key: "Capture method", label: "Capture method", className: "method-cell" },
+  { key: "Capture temperature", label: "Temperature (°C)", numeric: true },
+  { key: "Reaction Enthalpy", label: "Enthalpy (kJ/mol)", numeric: true },
+  { key: "Maximum Capacity", label: "Capacity (mol/kg)", numeric: true },
+  { key: "Reaction Kinetics", label: "Kinetics (min)", numeric: true },
+  { key: "Sorbent Cost", label: "Cost ($/kg)", numeric: true },
+  { key: "Year of publication", label: "Year" },
+];
+
+const PAGE_SIZE = 15;
+
+const FIELD_UNITS = {
+  "Capture temperature": "°C",
+  "Total pressure": "bar",
+  "CO2 concentration": "%",
+  "Reaction Enthalpy": "kJ/mol",
+  "Maximum Capacity": "mol/kg",
+  "Reaction Kinetics": "min",
+  "Reaction Kinetics 2": "s⁻¹",
+  "Cyclic Stability": "%",
+  "Capacity at max cycle": "%",
+  "Viscosity": "mPa·s",
+  "Corrosivity": "µm/yr",
+  "Volatility": "kPa",
+  "Sorbent Cost": "$/kg",
+};
+
+const PLOT_PARAMETERS = [
+  {
+    key: "cyclesPerTon",
+    label: "Cycles per 10 kg sorbent per ton CO₂",
+    axisTitle: "Cycles per 10 kg sorbent per ton CO<sub>2</sub>",
+    axisType: "log",
+  },
+  {
+    key: "energyGJPerTon",
+    label: "Energy (GJ per ton CO₂)",
+    axisTitle: "Energy (GJ per ton CO<sub>2</sub>)",
+  },
+  {
+    key: "totalCostPerTon",
+    label: "Cost (€ per ton CO₂)",
+    axisTitle: "Cost (€ per ton CO<sub>2</sub>)",
+  },
+  { key: "captureTemperature", label: "Capture temperature (°C)", axisTitle: "Capture temperature (°C)" },
+  { key: "totalPressure", label: "Total pressure (bar)", axisTitle: "Total pressure (bar)" },
+  { key: "co2Concentration", label: "CO₂ concentration (%)", axisTitle: "CO<sub>2</sub> concentration (%)" },
+  { key: "reactionEnthalpyKJPerMol", label: "Reaction enthalpy (kJ/mol)", axisTitle: "Reaction enthalpy (kJ/mol)" },
+  { key: "maximumCapacityMolPerKg", label: "Maximum capacity (mol/kg)", axisTitle: "Maximum capacity (mol/kg)" },
+  {
+    key: "reactionKineticsMin",
+    label: "Reaction kinetics (min)",
+    axisTitle: "Reaction kinetics (min)",
+    colorTransform: "log",
+  },
+  { key: "cyclicStability", label: "Cyclic stability (%)", axisTitle: "Cyclic stability (%)" },
+  { key: "maxCycles", label: "Maximum cycles", axisTitle: "Maximum cycles" },
+  { key: "capacityAtMaxCycle", label: "Capacity at max cycle (%)", axisTitle: "Capacity at max cycle (%)" },
+  { key: "sorbentCostPerKg", label: "Sorbent cost ($/kg)", axisTitle: "Sorbent cost ($/kg)" },
+];
+
+const DEFAULT_MAPPINGS = {
+  x: "cyclesPerTon",
+  y: "energyGJPerTon",
+  z: "totalCostPerTon",
+  size: "maximumCapacityMolPerKg",
+  color: "reactionKineticsMin",
 };
 
 function parseNum(value, stringsToRemove = []) {
@@ -217,80 +738,63 @@ function parseCSV(text) {
   return result.data;
 }
 
-function cleanData(rows) {
-  return rows
-    .map(row => {
-      const reactionEnthalpyKJPerMol = parseNum(row["Reaction Enthalpy"], ["kJ/mol"]);
-      const maximumCapacityMolPerKg = parseNum(row["Maximum Capacity"], ["mol/kg"]);
-      const sorbentCostEURPerKg = parseNum(row["Sorbent Cost"], ["$", "/kg"]);
-      const reactionKineticsMin = parseNum(row["Reaction Kinetics"]);
-      const reactionKineticsParsedMin = parseKinetics(row["Reaction Kinetics"]);
-      const captureTemperature = parseNum(row["Capture temperature"]);
-
-      return {
-        name: row["Sorbent name"]?.trim() ?? "",
-        reactionEnthalpyKJPerMol,
-        maximumCapacityMolPerKg,
-        sorbentCostEURPerKg,
-        reactionKineticsMin,
-        reactionKineticsParsedMin,
-        captureTemperature,
-        maxCycles: parseNum(row["Maximum Cycles"]),
-        transferability: parseNum(row["Transferability"]),
-      };
-    })
-    .filter(row =>
-      row.name !== "" &&
-      row.reactionEnthalpyKJPerMol !== null &&
-      row.maximumCapacityMolPerKg !== null &&
-      row.sorbentCostEURPerKg !== null &&
-      row.reactionKineticsMin !== null &&
-      row.captureTemperature !== null
-    );
-}
-
-function computeModel(data, priceKWh, includeMaterial) {
+function createVisualizationRows(rows, priceKWh, includeMaterial) {
   const priceEURPerKJ = priceKWh * MODEL.priceKJPerKWh;
 
-  return data
-    .map(row => {
-      const cyclesPerTonRaw = MODEL.gramsPerTon /
-        MODEL.molarMassCO2GramPerMol /
-        row.maximumCapacityMolPerKg /
-        MODEL.sorbentMassKg;
-      const cyclesPerTon = cyclesPerTonRaw / MODEL.cyclesScaleFactor;
+  return rows.map(source => {
+    const reactionEnthalpyKJPerMol = parseNum(source["Reaction Enthalpy"], ["kJ/mol"]);
+    const maximumCapacityMolPerKg = parseNum(source["Maximum Capacity"], ["mol/kg"]);
+    const sorbentCostPerKg = parseNum(source["Sorbent Cost"], ["$", "/kg"]);
 
+    let cyclesPerTon = null;
+    if (maximumCapacityMolPerKg !== null && maximumCapacityMolPerKg > 0) {
+      cyclesPerTon = MODEL.gramsPerTon /
+        MODEL.molarMassCO2GramPerMol /
+        maximumCapacityMolPerKg /
+        MODEL.sorbentMassKg /
+        MODEL.cyclesScaleFactor;
+    }
+
+    let energyGJPerTon = null;
+    let energyCostPerTon = null;
+    if (reactionEnthalpyKJPerMol !== null) {
       const energyKJPerTon = MODEL.gramsPerTon /
         MODEL.molarMassCO2GramPerMol *
-        row.reactionEnthalpyKJPerMol;
-      const energyGJPerTon = energyKJPerTon / 1e6;
-      const energyCostPerTon = energyKJPerTon * priceEURPerKJ;
+        reactionEnthalpyKJPerMol;
+      energyGJPerTon = energyKJPerTon / 1e6;
+      energyCostPerTon = energyKJPerTon * priceEURPerKJ;
+    }
 
-      const materialCost = MODEL.sorbentMassKg * row.sorbentCostEURPerKg;
+    let totalCostPerTon = null;
+    const hasMaterialCost = sorbentCostPerKg !== null || !includeMaterial;
+    if (energyCostPerTon !== null && cyclesPerTon !== null && hasMaterialCost) {
+      const materialCost = MODEL.sorbentMassKg * (sorbentCostPerKg ?? 0);
       const materialCostPerTon = includeMaterial ? materialCost / cyclesPerTon : 0;
       const clippedEnergyCostPerTon = Math.min(
         Math.max(energyCostPerTon, 0),
         MODEL.maxEnergyCostEUR
       );
-      const totalCostPerTon = clippedEnergyCostPerTon + materialCostPerTon;
+      totalCostPerTon = clippedEnergyCostPerTon + materialCostPerTon;
+    }
 
-      const timeSorpMin = row.reactionKineticsMin;
-      const logTimeSorp = timeSorpMin > 0 ? Math.log10(timeSorpMin) : null;
-
-      return {
-        ...row,
-        cyclesPerTon,
-        energyGJPerTon,
-        totalCostPerTon,
-        timeSorpMin,
-        logTimeSorp,
-      };
-    })
-    .filter(row =>
-      row.logTimeSorp !== null &&
-      Number.isFinite(row.totalCostPerTon) &&
-      row.totalCostPerTon >= 0
-    );
+    return {
+      source,
+      name: source["Sorbent name"]?.trim() ?? "",
+      cyclesPerTon,
+      energyGJPerTon,
+      totalCostPerTon,
+      captureTemperature: parseNum(source["Capture temperature"]),
+      totalPressure: parseNum(source["Total pressure"]),
+      co2Concentration: parseNum(source["CO2 concentration"]),
+      reactionEnthalpyKJPerMol,
+      maximumCapacityMolPerKg,
+      reactionKineticsMin: parseKinetics(source["Reaction Kinetics"]),
+      cyclicStability: parseNum(source["Cyclic Stability"]),
+      maxCycles: parseNum(source["Maximum Cycles"]),
+      capacityAtMaxCycle: parseNum(source["Capacity at max cycle"]),
+      sorbentCostPerKg,
+    };
+  });
 }
 
 function getPlotSize() {
@@ -299,29 +803,112 @@ function getPlotSize() {
   const size = Math.floor(Math.min(rect.width, rect.height));
 
   return {
-    width: Math.max(size, 400),
-    height: Math.max(size, 400),
+    width: Math.max(size, 300),
+    height: Math.max(size, 300),
   };
 }
 
-function makeFigure(points) {
-  const names = points.map(point => point.name);
-  const xs = points.map(point => point.cyclesPerTon);
-  const ys = points.map(point => point.energyGJPerTon);
-  const zs = points.map(point => point.totalCostPerTon);
-  const colors = points.map(point => point.logTimeSorp);
-  const sizes = points.map(point =>
-    Math.max(
-      MARKER.minSize,
-      Math.min(MARKER.maxSize, point.maximumCapacityMolPerKg * MARKER.capacitySizeScale)
-    )
-  );
+function getParameter(key) {
+  return PLOT_PARAMETERS.find(parameter => parameter.key === key);
+}
 
-  const minLogTime = Math.min(...colors);
-  const maxLogTime = Math.log10(COLORBAR.maxTimeMin);
-  const colorbarTickValues = COLORBAR.tickValuesMin.map(value => Math.log10(value));
-  const colorbarTickText = COLORBAR.tickValuesMin.map(String);
-  const plotSize = getPlotSize();
+function getPlotMappings() {
+  return {
+    x: getParameter(document.getElementById("x-parameter").value),
+    y: getParameter(document.getElementById("y-parameter").value),
+    z: getParameter(document.getElementById("z-parameter").value),
+    size: getParameter(document.getElementById("size-parameter").value),
+    color: getParameter(document.getElementById("color-parameter").value),
+  };
+}
+
+function createPlotPoints(rows, mappings) {
+  return rows
+    .filter(row => {
+      for (const mapping of Object.values(mappings)) {
+        const value = row[mapping.key];
+        if (!Number.isFinite(value)) return false;
+        if (mapping.axisType === "log" && value <= 0) return false;
+        if (mapping.colorTransform === "log" && value <= 0) return false;
+      }
+      return true;
+    })
+    .map(row => ({
+      name: row.name,
+      x: row[mappings.x.key],
+      y: row[mappings.y.key],
+      z: row[mappings.z.key],
+      sizeValue: row[mappings.size.key],
+      colorValue: row[mappings.color.key],
+    }));
+}
+
+function scaleMarkerSizes(values) {
+  if (values.length === 0) return [];
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  if (min === max) return values.map(() => (MARKER.minSize + MARKER.maxSize) / 2);
+
+  return values.map(value => {
+    const normalized = (value - min) / (max - min);
+    return MARKER.minSize + Math.sqrt(Math.max(0, normalized)) * (MARKER.maxSize - MARKER.minSize);
+  });
+}
+
+function makeAxisConfig(mapping, title, axisName) {
+  const config = {
+    title: { text: title || mapping.axisTitle, font: { size: 14 } },
+    type: mapping.axisType ?? "linear",
+    showbackground: true,
+    backgroundcolor: "#1a1a1a",
+    gridcolor: "#444",
+    zerolinecolor: "#555",
+    tickfont: { color: "#ccc", size: 12 },
+    titlefont: { color: "#ccc", size: 14 },
+  };
+
+  if (axisName === "x" && mapping.key === DEFAULT_MAPPINGS.x) {
+    config.range = AXIS.xLogRange;
+    config.tickmode = "array";
+    config.tickvals = AXIS.xTickVals;
+    config.ticktext = AXIS.xTickText;
+  }
+  if (axisName === "y" && mapping.key === DEFAULT_MAPPINGS.y) config.dtick = 2;
+  if (axisName === "z" && mapping.key === DEFAULT_MAPPINGS.z) {
+    config.range = AXIS.zRange;
+    config.dtick = 50;
+  }
+
+  return config;
+}
+
+function makeFigure(points, mappings) {
+  const names = points.map(point => point.name);
+  const xs = points.map(point => point.x);
+  const ys = points.map(point => point.y);
+  const zs = points.map(point => point.z);
+  const sizes = scaleMarkerSizes(points.map(point => point.sizeValue));
+  const rawColors = points.map(point => point.colorValue);
+  const colors = mappings.color.colorTransform === "log"
+    ? rawColors.map(value => Math.log10(value))
+    : rawColors;
+  const minColor = colors.length > 0 ? Math.min(...colors) : 0;
+  const maxColor = colors.length > 0 ? Math.max(...colors) : 1;
+  const colorbar = {
+    title: { text: mappings.color.label, side: "right" },
+    x: 0.92,
+    y: 0.5,
+    len: 0.5,
+    thickness: 20,
+    tickfont: { color: "#ddd", size: 13 },
+    titlefont: { color: "#ddd", size: 14 },
+  };
+
+  if (mappings.color.colorTransform === "log") {
+    colorbar.tickvals = COLORBAR.tickValuesMin.map(value => Math.log10(value));
+    colorbar.ticktext = COLORBAR.tickValuesMin.map(String);
+  }
 
   const trace = {
     type: "scatter3d",
@@ -330,30 +917,22 @@ function makeFigure(points) {
     y: ys,
     z: zs,
     text: names,
-    hovertemplate: "<b>%{text}</b><br>Cycles per 10 kg sorbent per ton CO<sub>2</sub>: %{x:.0f}<br>Energy: %{y:.2f} GJ/t<br>Cost: €%{z:.1f}/t<extra></extra>",
+    customdata: points.map(point => [point.sizeValue, point.colorValue]),
+    hovertemplate: `<b>%{text}</b><br>${mappings.x.label}: %{x:.3g}<br>${mappings.y.label}: %{y:.3g}<br>${mappings.z.label}: %{z:.3g}<br>${mappings.size.label}: %{customdata[0]:.3g}<br>${mappings.color.label}: %{customdata[1]:.3g}<extra></extra>`,
     marker: {
       size: sizes,
       color: colors,
       colorscale: "RdYlGn",
       reversescale: true,
-      cmin: minLogTime,
-      cmax: maxLogTime,
-      colorbar: {
-        title: { text: "Time, min", side: "right" },
-        tickvals: colorbarTickValues,
-        ticktext: colorbarTickText,
-        x: 0.92,
-        y: 0.5,
-        len: 0.5,
-        thickness: 20,
-        tickfont: { color: "#ddd", size: 13 },
-        titlefont: { color: "#ddd", size: 14 },
-      },
+      cmin: minColor,
+      cmax: minColor === maxColor ? minColor + 1 : maxColor,
+      colorbar,
       opacity: MARKER.opacity,
       line: { width: 0.5, color: "#fff" },
     },
   };
 
+  const plotSize = getPlotSize();
   const layout = {
     paper_bgcolor: "#111",
     plot_bgcolor: "#111",
@@ -365,49 +944,271 @@ function makeFigure(points) {
       bgcolor: "#111",
       aspectmode: "cube",
       domain: { x: [0, 0.88], y: [0, 1] },
-      xaxis: {
-        title: { text: "Cycles per 10 kg sorbent per ton CO<sub>2</sub>", font: { size: 14 } },
-        type: "log",
-        range: AXIS.xLogRange,
-        tickmode: "array",
-        tickvals: AXIS.xTickVals,
-        ticktext: AXIS.xTickText,
-        showbackground: true,
-        backgroundcolor: "#1a1a1a",
-        gridcolor: "#444",
-        zerolinecolor: "#555",
-        tickfont: { color: "#ccc", size: 12 },
-        titlefont: { color: "#ccc", size: 14 },
-      },
-      yaxis: {
-        title: { text: "Energy (GJ per ton CO<sub>2</sub>)", font: { size: 14 } },
-        showbackground: true,
-        backgroundcolor: "#1a1a1a",
-        gridcolor: "#444",
-        zerolinecolor: "#555",
-        tickfont: { color: "#ccc", size: 12 },
-        titlefont: { color: "#ccc", size: 14 },
-        dtick: 2,
-      },
-      zaxis: {
-        title: { text: "Cost (€ per ton CO<sub>2</sub>)", font: { size: 14 } },
-        range: AXIS.zRange,
-        showbackground: true,
-        backgroundcolor: "#1a1a1a",
-        gridcolor: "#444",
-        zerolinecolor: "#555",
-        tickfont: { color: "#ccc", size: 12 },
-        titlefont: { color: "#ccc", size: 14 },
-        dtick: 50,
-      },
+      xaxis: makeAxisConfig(mappings.x, document.getElementById("x-title").value.trim(), "x"),
+      yaxis: makeAxisConfig(mappings.y, document.getElementById("y-title").value.trim(), "y"),
+      zaxis: makeAxisConfig(mappings.z, document.getElementById("z-title").value.trim(), "z"),
     },
     scene_camera: CAMERA,
   };
 
+  if (points.length === 0) {
+    layout.annotations = [{
+      text: "No filtered records have values for all selected plot mappings.",
+      showarrow: false,
+      x: 0.45,
+      y: 0.5,
+      xref: "paper",
+      yref: "paper",
+      font: { color: "#aaa", size: 15 },
+    }];
+  }
+
   return { trace, layout };
 }
 
-let globalData = null;
+let allRows = [];
+let filteredRows = [];
+let currentPage = 1;
+let currentPageSize = PAGE_SIZE;
+let sortState = { key: "Sorbent name", direction: 1 };
+
+function initializePlotControls() {
+  const controls = {
+    "x-parameter": DEFAULT_MAPPINGS.x,
+    "y-parameter": DEFAULT_MAPPINGS.y,
+    "z-parameter": DEFAULT_MAPPINGS.z,
+    "size-parameter": DEFAULT_MAPPINGS.size,
+    "color-parameter": DEFAULT_MAPPINGS.color,
+  };
+
+  for (const [selectId, defaultValue] of Object.entries(controls)) {
+    const select = document.getElementById(selectId);
+    for (const parameter of PLOT_PARAMETERS) {
+      const option = document.createElement("option");
+      option.value = parameter.key;
+      option.textContent = parameter.label;
+      select.appendChild(option);
+    }
+    select.value = defaultValue;
+  }
+
+  for (const axis of ["x", "y", "z"]) {
+    document.getElementById(`${axis}-title`).value = getParameter(DEFAULT_MAPPINGS[axis]).label;
+  }
+}
+
+function populateSelect(selectId, values) {
+  const select = document.getElementById(selectId);
+  const options = [...new Set(values.map(value => value.trim()).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+
+  for (const value of options) {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = value;
+    select.appendChild(option);
+  }
+}
+
+function initializeFilters() {
+  populateSelect("category-filter", allRows.map(row => row["Sorbent category"] ?? ""));
+  populateSelect("method-filter", allRows.map(row => row["Capture method"] ?? ""));
+}
+
+function getFilteredRows() {
+  const searchTerm = document.getElementById("search-input").value.trim().toLowerCase();
+  const category = document.getElementById("category-filter").value;
+  const method = document.getElementById("method-filter").value;
+
+  return allRows.filter(row => {
+    if (category && row["Sorbent category"]?.trim() !== category) return false;
+    if (method && row["Capture method"]?.trim() !== method) return false;
+
+    if (searchTerm) {
+      const searchableText = Object.values(row).join(" ").toLowerCase();
+      if (!searchableText.includes(searchTerm)) return false;
+    }
+
+    return true;
+  });
+}
+
+function sortRows(rows) {
+  const column = TABLE_COLUMNS.find(item => item.key === sortState.key);
+
+  return [...rows].sort((a, b) => {
+    const rawA = String(a[sortState.key] ?? "").trim();
+    const rawB = String(b[sortState.key] ?? "").trim();
+
+    if (!rawA && !rawB) return 0;
+    if (!rawA) return 1;
+    if (!rawB) return -1;
+
+    let comparison;
+    if (column?.numeric) {
+      const numberA = parseNum(rawA);
+      const numberB = parseNum(rawB);
+      if (numberA !== null && numberB !== null) comparison = numberA - numberB;
+    }
+
+    if (comparison === undefined) {
+      comparison = rawA.localeCompare(rawB, undefined, {
+        numeric: true,
+        sensitivity: "base",
+      });
+    }
+
+    return comparison * sortState.direction;
+  });
+}
+
+function renderTableHeader() {
+  const tableHead = document.getElementById("table-head");
+  tableHead.replaceChildren();
+
+  for (const column of TABLE_COLUMNS) {
+    const header = document.createElement("th");
+    const button = document.createElement("button");
+    const active = sortState.key === column.key;
+    const indicator = active ? (sortState.direction === 1 ? " ▲" : " ▼") : "";
+
+    button.type = "button";
+    button.textContent = column.label + indicator;
+    button.setAttribute("aria-label", `Sort by ${column.label}${active ? (sortState.direction === 1 ? ", ascending" : ", descending") : ""}`);
+    button.addEventListener("click", () => {
+      if (sortState.key === column.key) {
+        sortState.direction *= -1;
+      } else {
+        sortState = { key: column.key, direction: 1 };
+      }
+      currentPage = 1;
+      renderTable();
+    });
+
+    header.appendChild(button);
+    tableHead.appendChild(header);
+  }
+
+  const actionHeader = document.createElement("th");
+  actionHeader.textContent = "All fields";
+  tableHead.appendChild(actionHeader);
+}
+
+function appendCell(rowElement, value, className = "") {
+  const cell = document.createElement("td");
+  const text = String(value ?? "").trim();
+  cell.textContent = text || "—";
+  if (!text) cell.classList.add("empty-value");
+  if (className) cell.classList.add(className);
+  rowElement.appendChild(cell);
+}
+
+function openDetails(row) {
+  const dialog = document.getElementById("detail-dialog");
+  const fields = document.getElementById("detail-fields");
+  const name = row["Sorbent name"]?.trim() || "Sorbent details";
+
+  document.getElementById("detail-title").textContent = name;
+  fields.replaceChildren();
+
+  for (const [key, rawValue] of Object.entries(row)) {
+    if (key === "__parsed_extra") continue;
+
+    const term = document.createElement("dt");
+    const description = document.createElement("dd");
+    const unit = FIELD_UNITS[key];
+    const value = String(rawValue ?? "").trim();
+
+    term.textContent = unit ? `${key} (${unit})` : key;
+    description.textContent = value || "Not reported";
+    if (!value) description.classList.add("empty-value");
+
+    fields.append(term, description);
+  }
+
+  dialog.showModal();
+}
+
+function renderTable() {
+  const sortedRows = sortRows(filteredRows);
+  const effectivePageSize = currentPageSize === Infinity
+    ? Math.max(1, sortedRows.length)
+    : currentPageSize;
+  const totalPages = Math.max(1, Math.ceil(sortedRows.length / effectivePageSize));
+  currentPage = Math.min(currentPage, totalPages);
+
+  const start = (currentPage - 1) * effectivePageSize;
+  const pageRows = sortedRows.slice(start, start + effectivePageSize);
+  const tableBody = document.getElementById("table-body");
+  tableBody.replaceChildren();
+
+  for (const row of pageRows) {
+    const rowElement = document.createElement("tr");
+
+    for (const column of TABLE_COLUMNS) {
+      appendCell(rowElement, row[column.key], column.className);
+    }
+
+    const actionCell = document.createElement("td");
+    const detailsButton = document.createElement("button");
+    detailsButton.type = "button";
+    detailsButton.className = "details-button";
+    detailsButton.textContent = "View";
+    detailsButton.setAttribute("aria-label", `View all fields for ${row["Sorbent name"] || "this sorbent"}`);
+    detailsButton.addEventListener("click", () => openDetails(row));
+    actionCell.appendChild(detailsButton);
+    rowElement.appendChild(actionCell);
+    tableBody.appendChild(rowElement);
+  }
+
+  if (pageRows.length === 0) {
+    const rowElement = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = TABLE_COLUMNS.length + 1;
+    cell.className = "empty-value";
+    cell.textContent = "No records match the current filters.";
+    rowElement.appendChild(cell);
+    tableBody.appendChild(rowElement);
+  }
+
+  renderTableHeader();
+  document.getElementById("page-info").textContent = currentPageSize === Infinity
+    ? `${sortedRows.length} rows`
+    : `Page ${currentPage} of ${totalPages}`;
+  document.getElementById("previous-page").disabled = currentPageSize === Infinity || currentPage <= 1;
+  document.getElementById("next-page").disabled = currentPageSize === Infinity || currentPage >= totalPages;
+}
+
+function renderPlot() {
+  if (allRows.length === 0) return;
+
+  const priceSlider = document.getElementById("price-slider");
+  const priceKWh = parseFloat(priceSlider.value);
+  const includeMaterial = document.getElementById("include-mat").checked;
+  const mappings = getPlotMappings();
+  const visualizationRows = createVisualizationRows(filteredRows, priceKWh, includeMaterial);
+  const points = createPlotPoints(visualizationRows, mappings);
+
+  document.getElementById("price-val").textContent = priceKWh.toFixed(2) + " €/kWh";
+
+  const { trace, layout } = makeFigure(points, mappings);
+  Plotly.react("plot", [trace], layout, {
+    responsive: true,
+    displayModeBar: true,
+  });
+
+  document.getElementById("status").textContent =
+    `${filteredRows.length} matching records; ${points.length} have the values required for this plot.`;
+  document.getElementById("result-summary").textContent =
+    `Showing ${filteredRows.length} of ${allRows.length} records. ${points.length} are represented in the 3D plot with the current settings.`;
+}
+
+function renderAll({ resetPage = false } = {}) {
+  if (resetPage) currentPage = 1;
+  filteredRows = getFilteredRows();
+  renderTable();
+  renderPlot();
+}
 
 async function loadData() {
   const status = document.getElementById("status");
@@ -418,46 +1219,68 @@ async function loadData() {
 
     const text = await response.text();
     const rows = parseCSV(text);
-    globalData = cleanData(rows);
+    allRows = rows.filter(row => row["Sorbent name"]?.trim());
 
-    status.textContent = `Loaded ${globalData.length} sorbents.`;
-    render();
+    initializeFilters();
+    renderAll({ resetPage: true });
   } catch (error) {
-    status.textContent = "Error loading data: " + error.message;
+    const localHint = window.location.protocol === "file:"
+      ? " Open this page through a local web server instead of file://."
+      : "";
+    status.textContent = "Error loading data: " + error.message + localHint;
     console.error(error);
   }
 }
 
-function render() {
-  if (!globalData) return;
-
-  const priceSlider = document.getElementById("price-slider");
-  const priceValue = document.getElementById("price-val");
-  const includeMaterial = document.getElementById("include-mat").checked;
-  const priceKWh = parseFloat(priceSlider.value);
-
-  priceValue.textContent = priceKWh.toFixed(2) + " €/kWh";
-
-  const points = computeModel(globalData, priceKWh, includeMaterial);
-  const { trace, layout } = makeFigure(points);
-
-  Plotly.react("plot", [trace], layout, {
-    responsive: true,
-    displayModeBar: true,
-  });
-}
-
 function resizePlot() {
-  if (!globalData) return;
+  if (allRows.length === 0) return;
 
   const plotSize = getPlotSize();
   Plotly.relayout("plot", plotSize);
 }
 
-document.getElementById("price-slider").addEventListener("input", render);
-document.getElementById("include-mat").addEventListener("change", render);
+document.getElementById("search-input").addEventListener("input", () => renderAll({ resetPage: true }));
+document.getElementById("category-filter").addEventListener("change", () => renderAll({ resetPage: true }));
+document.getElementById("method-filter").addEventListener("change", () => renderAll({ resetPage: true }));
+document.getElementById("reset-filters").addEventListener("click", () => {
+  document.getElementById("search-input").value = "";
+  document.getElementById("category-filter").value = "";
+  document.getElementById("method-filter").value = "";
+  renderAll({ resetPage: true });
+});
+document.getElementById("previous-page").addEventListener("click", () => {
+  currentPage -= 1;
+  renderTable();
+});
+document.getElementById("next-page").addEventListener("click", () => {
+  currentPage += 1;
+  renderTable();
+});
+document.getElementById("page-size").addEventListener("change", event => {
+  currentPageSize = event.target.value === "all" ? Infinity : parseInt(event.target.value, 10);
+  currentPage = 1;
+  renderTable();
+});
+document.getElementById("price-slider").addEventListener("input", renderPlot);
+document.getElementById("include-mat").addEventListener("change", renderPlot);
+for (const axis of ["x", "y", "z"]) {
+  document.getElementById(`${axis}-parameter`).addEventListener("change", event => {
+    document.getElementById(`${axis}-title`).value = getParameter(event.target.value).label;
+    renderPlot();
+  });
+  document.getElementById(`${axis}-title`).addEventListener("input", renderPlot);
+}
+document.getElementById("size-parameter").addEventListener("change", renderPlot);
+document.getElementById("color-parameter").addEventListener("change", renderPlot);
+document.getElementById("close-dialog").addEventListener("click", () => {
+  document.getElementById("detail-dialog").close();
+});
+document.getElementById("detail-dialog").addEventListener("click", event => {
+  if (event.target === event.currentTarget) event.currentTarget.close();
+});
 window.addEventListener("resize", resizePlot);
 
+initializePlotControls();
 loadData();
 </script>
 </body>
