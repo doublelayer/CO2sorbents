@@ -50,29 +50,31 @@
 
   main {
     width: 100%;
-    max-width: 1500px;
+    max-width: 1800px;
     margin: 0 auto;
   }
 
   #layout {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 350px 310px;
+    align-items: start;
     width: 100%;
     min-height: 620px;
     gap: 16px;
   }
 
   #plot {
-    flex: 1 1 auto;
     min-width: 0;
     height: min(720px, calc(100vh - 8rem));
     min-height: 540px;
   }
 
-  #sidepanel {
-    flex: 0 0 360px;
+  #sidepanel,
+  #formula-reference {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    min-width: 0;
     height: fit-content;
     padding: 1rem;
     background: var(--panel);
@@ -80,53 +82,7 @@
     border-radius: 8px;
   }
 
-  #controls {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .control-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  #controls label,
-  .control-row label {
-    color: var(--muted);
-    font-size: 14px;
-  }
-
-  #price-slider {
-    width: 100%;
-    height: 4px;
-    background: #444;
-    border-radius: 2px;
-    outline: none;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-  }
-
-  #price-slider::-webkit-slider-thumb {
-    width: 18px;
-    height: 18px;
-    background: var(--accent);
-    border-radius: 50%;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-  }
-
-  #price-val {
-    min-width: 80px;
-    color: #4caf50;
-    font-size: 15px;
-    font-weight: 600;
-  }
-
-  #include-mat {
+  input[type="checkbox"] {
     width: 16px;
     height: 16px;
     accent-color: var(--accent);
@@ -181,6 +137,7 @@
 
   input[type="search"],
   input[type="text"],
+  input[type="number"],
   select,
   button {
     min-height: 38px;
@@ -194,6 +151,7 @@
 
   input[type="search"]:focus,
   input[type="text"]:focus,
+  input[type="number"]:focus,
   select:focus,
   button:focus-visible {
     border-color: var(--accent);
@@ -204,20 +162,14 @@
     cursor: pointer;
   }
 
-  button:hover {
+  button:not(:disabled):hover {
     background: #303030;
   }
 
-  #plot-options {
-    padding-top: 0.7rem;
-    border-top: 1px solid var(--border);
-  }
-
-  #plot-options summary {
+  .panel-heading {
     color: #ccc;
     font-size: 0.9rem;
     font-weight: 600;
-    cursor: pointer;
   }
 
   .mapping-grid {
@@ -244,6 +196,191 @@
     min-width: 0;
   }
 
+  .formula-error {
+    display: none;
+    margin-top: 4px;
+    color: #ff8d8d;
+    font-size: 0.72rem;
+    line-height: 1.3;
+  }
+
+  .formula-error:not(:empty) {
+    display: block;
+  }
+
+  .log-toggle {
+    display: flex;
+    align-items: center;
+    min-height: 38px;
+    gap: 7px;
+    color: #ccc;
+    font-size: 0.82rem;
+  }
+
+  .log-toggle input {
+    flex: 0 0 16px;
+    width: 16px;
+    min-width: 16px;
+  }
+
+  #extra-settings {
+    margin-top: 0.85rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
+
+  #extra-settings summary {
+    color: #ccc;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .extra-settings-body {
+    margin-top: 0.7rem;
+  }
+
+  .range-grid {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) minmax(0, 1fr) 34px;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .range-grid label,
+  .range-heading {
+    color: var(--muted);
+    font-size: 0.72rem;
+  }
+
+  .range-heading {
+    text-align: center;
+  }
+
+  .range-grid input[type="number"] {
+    width: 100%;
+    min-width: 0;
+    min-height: 34px;
+    padding: 0.35rem 0.45rem;
+  }
+
+  .range-grid .log-toggle {
+    justify-content: center;
+    min-height: 34px;
+  }
+
+  .range-grid .log-toggle input {
+    margin: 0;
+  }
+
+  .extra-palette {
+    margin-top: 0.7rem;
+  }
+
+  #export-plot {
+    width: 100%;
+    color: var(--accent);
+  }
+
+  #export-plot:disabled {
+    color: #777;
+    cursor: not-allowed;
+  }
+
+  .user-variables {
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mapping-subheading {
+    color: #ccc;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .variable-hint {
+    margin-top: 0.25rem;
+    color: var(--muted);
+    font-size: 0.72rem;
+    line-height: 1.35;
+  }
+
+  #user-variable-list {
+    display: grid;
+    gap: 6px;
+    margin-top: 0.55rem;
+  }
+
+  .user-variable-row {
+    display: grid;
+    grid-template-columns: minmax(70px, 0.8fr) minmax(90px, 1fr) 34px;
+    gap: 6px;
+  }
+
+  .user-variable-row input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .remove-variable {
+    min-width: 34px;
+    padding: 0.25rem;
+    color: #e6a0a0;
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  #add-variable {
+    min-height: 32px;
+    margin-top: 7px;
+    padding: 0.3rem 0.55rem;
+    color: var(--accent);
+    font-size: 0.78rem;
+  }
+
+  .formula-help {
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.45;
+  }
+
+  .formula-help p {
+    margin-top: 0.75rem;
+  }
+
+  .symbol-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.76rem;
+  }
+
+  .symbol-table th,
+  .symbol-table td {
+    padding: 0.28rem 0.35rem;
+    border-bottom: 1px solid #343434;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .symbol-table th {
+    color: #bbb;
+    font-weight: 600;
+  }
+
+  .symbol-table td:first-child {
+    width: 52px;
+  }
+
+  .symbol-table code {
+    color: #9ee6a5;
+    font-size: 0.8rem;
+  }
+
+  input[aria-invalid="true"] {
+    border-color: #d96b6b;
+    outline-color: #522;
+  }
+
   #result-summary {
     margin-bottom: 0.65rem;
     color: var(--muted);
@@ -256,22 +393,22 @@
     border-radius: 6px;
   }
 
-  table {
+  #explorer table {
     width: 100%;
     min-width: 1100px;
     border-collapse: collapse;
     font-size: 0.82rem;
   }
 
-  th,
-  td {
+  #explorer th,
+  #explorer td {
     padding: 0.65rem 0.7rem;
     border-bottom: 1px solid #343434;
     text-align: left;
     vertical-align: top;
   }
 
-  th {
+  #explorer th {
     position: sticky;
     top: 0;
     z-index: 1;
@@ -280,7 +417,7 @@
     white-space: nowrap;
   }
 
-  th button {
+  #explorer th button {
     min-height: auto;
     padding: 0;
     color: inherit;
@@ -289,16 +426,16 @@
     font-weight: 600;
   }
 
-  th button:hover {
+  #explorer th button:hover {
     color: white;
     background: transparent;
   }
 
-  tbody tr:hover {
+  #explorer tbody tr:hover {
     background: #242424;
   }
 
-  tbody tr:last-child td {
+  #explorer tbody tr:last-child td {
     border-bottom: 0;
   }
 
@@ -417,9 +554,19 @@
     color: #8fcaef;
   }
 
+  @media (max-width: 1200px) {
+    #layout {
+      grid-template-columns: minmax(0, 1fr) 350px;
+    }
+
+    #formula-reference {
+      grid-column: 1 / -1;
+    }
+  }
+
   @media (max-width: 900px) {
     #layout {
-      flex-direction: column;
+      grid-template-columns: 1fr;
     }
 
     #plot {
@@ -428,8 +575,9 @@
       min-height: 500px;
     }
 
-    #sidepanel {
-      flex-basis: auto;
+    #sidepanel,
+    #formula-reference {
+      grid-column: auto;
       width: 100%;
     }
 
@@ -475,55 +623,133 @@
 <main>
   <div id="layout">
     <div id="plot" aria-label="Interactive 3D plot of filtered sorbents"></div>
-    <div id="sidepanel">
-      <div id="controls">
-        <label for="price-slider">Electricity price:</label>
-        <input type="range" id="price-slider" min="0.05" max="0.80" step="0.01" value="0.20">
-        <span id="price-val">0.20 €/kWh</span>
-      </div>
-      <div class="control-row">
-        <label for="include-mat">Include material cost</label>
-        <input type="checkbox" id="include-mat" checked>
-      </div>
-      <details id="plot-options" open>
-        <summary>Plot mappings</summary>
-        <div class="mapping-grid">
+    <section id="sidepanel" aria-labelledby="plot-mappings-title">
+      <h2 id="plot-mappings-title" class="panel-heading">Plot mappings</h2>
+      <div class="mapping-grid">
           <div class="mapping-control">
-            <label for="x-parameter">X axis</label>
-            <select id="x-parameter"></select>
+            <label for="x-expression">X equation</label>
+            <div>
+              <input type="text" id="x-expression" spellcheck="false" autocomplete="off">
+              <p id="x-expression-error" class="formula-error" aria-live="polite"></p>
+            </div>
           </div>
           <div class="mapping-control">
-            <label for="x-title">X axis name</label>
+            <label for="x-title">X axis title</label>
             <input type="text" id="x-title">
           </div>
           <div class="mapping-control">
-            <label for="y-parameter">Y axis</label>
-            <select id="y-parameter"></select>
+            <label for="y-expression">Y equation</label>
+            <div>
+              <input type="text" id="y-expression" spellcheck="false" autocomplete="off">
+              <p id="y-expression-error" class="formula-error" aria-live="polite"></p>
+            </div>
           </div>
           <div class="mapping-control">
-            <label for="y-title">Y axis name</label>
+            <label for="y-title">Y axis title</label>
             <input type="text" id="y-title">
           </div>
           <div class="mapping-control">
-            <label for="z-parameter">Z axis</label>
-            <select id="z-parameter"></select>
+            <label for="z-expression">Z equation</label>
+            <div>
+              <input type="text" id="z-expression" spellcheck="false" autocomplete="off">
+              <p id="z-expression-error" class="formula-error" aria-live="polite"></p>
+            </div>
           </div>
           <div class="mapping-control">
-            <label for="z-title">Z axis name</label>
+            <label for="z-title">Z axis title</label>
             <input type="text" id="z-title">
           </div>
           <div class="mapping-control">
-            <label for="size-parameter">Marker size</label>
-            <select id="size-parameter"></select>
+            <label for="size-expression">Size equation</label>
+            <div>
+              <input type="text" id="size-expression" spellcheck="false" autocomplete="off">
+              <p id="size-expression-error" class="formula-error" aria-live="polite"></p>
+            </div>
           </div>
           <div class="mapping-control">
-            <label for="color-parameter">Marker color</label>
-            <select id="color-parameter"></select>
+            <label for="size-title">Size title</label>
+            <input type="text" id="size-title">
           </div>
+          <div class="mapping-control">
+            <label for="color-expression">Color equation</label>
+            <div>
+              <input type="text" id="color-expression" spellcheck="false" autocomplete="off">
+              <p id="color-expression-error" class="formula-error" aria-live="polite"></p>
+            </div>
+          </div>
+          <div class="mapping-control">
+            <label for="color-title">Color title</label>
+            <input type="text" id="color-title">
+          </div>
+      </div>
+      <details id="extra-settings">
+        <summary>Extra settings</summary>
+        <div class="extra-settings-body">
+            <p class="variable-hint">Leave minimum or maximum blank to determine it automatically.</p>
+            <div class="range-grid">
+              <span></span>
+              <span class="range-heading">Minimum</span>
+              <span class="range-heading">Maximum</span>
+              <span class="range-heading">Log</span>
+
+              <label for="x-min">X</label>
+              <input type="number" id="x-min" step="any" placeholder="Auto" aria-label="X minimum">
+              <input type="number" id="x-max" step="any" placeholder="Auto" aria-label="X maximum">
+              <label class="log-toggle" title="Use a logarithmic X axis"><input type="checkbox" id="x-log" aria-label="Logarithmic X axis"></label>
+
+              <label for="y-min">Y</label>
+              <input type="number" id="y-min" step="any" placeholder="Auto" aria-label="Y minimum">
+              <input type="number" id="y-max" step="any" placeholder="Auto" aria-label="Y maximum">
+              <label class="log-toggle" title="Use a logarithmic Y axis"><input type="checkbox" id="y-log" aria-label="Logarithmic Y axis"></label>
+
+              <label for="z-min">Z</label>
+              <input type="number" id="z-min" step="any" placeholder="Auto" aria-label="Z minimum">
+              <input type="number" id="z-max" step="any" placeholder="Auto" aria-label="Z maximum">
+              <label class="log-toggle" title="Use a logarithmic Z axis"><input type="checkbox" id="z-log" aria-label="Logarithmic Z axis"></label>
+
+              <label for="size-min">Size</label>
+              <input type="number" id="size-min" step="any" placeholder="Auto" aria-label="Size minimum">
+              <input type="number" id="size-max" step="any" placeholder="Auto" aria-label="Size maximum">
+              <span></span>
+
+              <label for="color-min">Color</label>
+              <input type="number" id="color-min" step="any" placeholder="Auto" aria-label="Color minimum">
+              <input type="number" id="color-max" step="any" placeholder="Auto" aria-label="Color maximum">
+              <span></span>
+            </div>
+            <p id="range-settings-error" class="formula-error" aria-live="polite"></p>
+            <div class="mapping-control extra-palette">
+              <label for="color-scale">Color palette</label>
+              <select id="color-scale"></select>
+            </div>
         </div>
       </details>
+      <button type="button" id="export-plot" disabled>Export transparent SVG</button>
       <div id="status" role="status" aria-live="polite">Loading data…</div>
-    </div>
+    </section>
+
+    <aside id="formula-reference" aria-labelledby="formula-reference-title">
+      <h2 id="formula-reference-title" class="panel-heading">Symbols and operations</h2>
+      <div class="user-variables">
+        <p class="mapping-subheading">User variables</p>
+        <p class="variable-hint"><code>EP</code> is electricity price in €/kWh.</p>
+        <div id="user-variable-list"></div>
+        <p id="user-variables-error" class="formula-error" aria-live="polite"></p>
+        <button type="button" id="add-variable">Add variable</button>
+      </div>
+      <div class="formula-help">
+        <table class="symbol-table">
+          <thead>
+            <tr><th>Symbol</th><th>Table parameter</th></tr>
+          </thead>
+          <tbody id="formula-symbols"></tbody>
+        </table>
+        <p>User-variable names are available in every equation.</p>
+        <p><strong>Scientific notation:</strong> <code>1E6</code> means 1,000,000.</p>
+        <p><strong>Operators:</strong> <code>+ − * / ^</code> and parentheses.</p>
+        <p><strong>Functions:</strong> <code>min</code>, <code>max</code>, <code>abs</code>, <code>sqrt</code>, <code>log</code>, <code>log10</code>, <code>exp</code>, <code>pow</code>, and <code>if</code>.</p>
+      </div>
+    </aside>
   </div>
 
   <section id="explorer" aria-labelledby="explorer-title">
@@ -589,39 +815,20 @@
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSrocYVch0p6yXg-tc6RrSRPpx1v1POsZT9gfKeCPJ5wKCNRD40LxtIlI3llEtRY1WdJpSSs5T7D1kG/pub?gid=159971136&single=true&output=csv";
 
-const MODEL = {
-  priceKJPerKWh: 1 / 3600,
-  molarMassCO2GramPerMol: 44.0095,
-  gramsPerTon: 1e6,
-  sorbentMassKg: 1.0,
-  cyclesScaleFactor: 10,
-  maxEnergyCostEUR: 1e12,
-};
-
 const MARKER = {
   minSize: 4,
   maxSize: 40,
   opacity: 0.9,
 };
 
-const COLORBAR = {
-  maxTimeMin: 100,
-  tickValuesMin: [1, 2, 5, 10, 20, 50, 100, 500],
-};
-
-const AXIS = {
-  xLogRange: [2, 3.699],
-  xTickVals: [
-    1e2, 2e2, 3e2, 4e2, 5e2, 6e2, 7e2, 8e2, 9e2,
-    1e3, 2e3, 3e3, 4e3, 5e3
-  ],
-  xTickText: ["10²", "", "", "", "", "", "", "", "", "10³", "", "", "", ""],
-  zRange: [0, 300],
-};
+const TRANSPARENT = "rgba(0,0,0,0)";
 
 const CAMERA = {
   eye: { x: 1.6, y: -1.6, z: 0.4 },
 };
+
+const AXIS_NAMES = ["x", "y", "z"];
+const MAPPING_NAMES = [...AXIS_NAMES, "size", "color"];
 
 const TABLE_COLUMNS = [
   { key: "Sorbent name", label: "Sorbent name", className: "name-cell" },
@@ -634,6 +841,9 @@ const TABLE_COLUMNS = [
   { key: "Sorbent Cost", label: "Cost ($/kg)", numeric: true },
   { key: "Year of publication", label: "Year" },
 ];
+
+const TABLE_COLUMNS_BY_KEY = new Map(TABLE_COLUMNS.map(column => [column.key, column]));
+const SORT_COLLATOR = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
 
 const PAGE_SIZE = 15;
 
@@ -653,75 +863,361 @@ const FIELD_UNITS = {
   "Sorbent Cost": "$/kg",
 };
 
-const PLOT_PARAMETERS = [
-  {
-    key: "cyclesPerTon",
-    label: "Cycles per 10 kg sorbent per ton CO₂",
-    axisTitle: "Cycles per 10 kg sorbent per ton CO<sub>2</sub>",
+const DEFAULT_MAPPINGS = {
+  x: {
+    expression: "1E5 / (44 * C)",
+    title: "Cycles per 10 kg sorbent per ton CO₂",
     axisType: "log",
+    min: 100,
+    max: 10000,
   },
+  y: {
+    expression: "H / 44",
+    title: "Energy (GJ per ton CO₂)",
+    axisType: "linear",
+    min: 0,
+    max: 6,
+  },
+  z: {
+    expression: "10^6 * H * EP / (3600 * 44) + 44 * C * M / 10^5",
+    title: "Cost (€ per ton CO₂)",
+    axisType: "linear",
+    min: 0,
+    max: 300,
+  },
+  size: { expression: "C", title: "Maximum capacity (mol/kg)", min: 0.2, max: 17.8 },
+  color: { expression: "t", title: "Reaction kinetics (min)", min: 2, max: 100 },
+};
+
+const COLOR_SCALES = [
   {
-    key: "energyGJPerTon",
-    label: "Energy (GJ per ton CO₂)",
-    axisTitle: "Energy (GJ per ton CO<sub>2</sub>)",
+    value: "RdYlGn_r",
+    label: "Green–yellow–red (RdYlGn_r)",
+    colors: [
+      [0.0, "#006837"],
+      [0.1, "#1a9850"],
+      [0.2, "#66bd63"],
+      [0.3, "#a6d96a"],
+      [0.4, "#d9ef8b"],
+      [0.5, "#ffffbf"],
+      [0.6, "#fee08b"],
+      [0.7, "#fdae61"],
+      [0.8, "#f46d43"],
+      [0.9, "#d73027"],
+      [1.0, "#a50026"],
+    ],
   },
-  {
-    key: "totalCostPerTon",
-    label: "Cost (€ per ton CO₂)",
-    axisTitle: "Cost (€ per ton CO<sub>2</sub>)",
-  },
-  { key: "captureTemperature", label: "Capture temperature (°C)", axisTitle: "Capture temperature (°C)" },
-  { key: "totalPressure", label: "Total pressure (bar)", axisTitle: "Total pressure (bar)" },
-  { key: "co2Concentration", label: "CO₂ concentration (%)", axisTitle: "CO<sub>2</sub> concentration (%)" },
-  { key: "reactionEnthalpyKJPerMol", label: "Reaction enthalpy (kJ/mol)", axisTitle: "Reaction enthalpy (kJ/mol)" },
-  { key: "maximumCapacityMolPerKg", label: "Maximum capacity (mol/kg)", axisTitle: "Maximum capacity (mol/kg)" },
-  {
-    key: "reactionKineticsMin",
-    label: "Reaction kinetics (min)",
-    axisTitle: "Reaction kinetics (min)",
-    colorTransform: "log",
-  },
-  { key: "cyclicStability", label: "Cyclic stability (%)", axisTitle: "Cyclic stability (%)" },
-  { key: "maxCycles", label: "Maximum cycles", axisTitle: "Maximum cycles" },
-  { key: "capacityAtMaxCycle", label: "Capacity at max cycle (%)", axisTitle: "Capacity at max cycle (%)" },
-  { key: "sorbentCostPerKg", label: "Sorbent cost ($/kg)", axisTitle: "Sorbent cost ($/kg)" },
+  { value: "Viridis", label: "Viridis", colors: "Viridis" },
+  { value: "Cividis", label: "Cividis", colors: "Cividis" },
 ];
 
-const DEFAULT_MAPPINGS = {
-  x: "cyclesPerTon",
-  y: "energyGJPerTon",
-  z: "totalCostPerTon",
-  size: "maximumCapacityMolPerKg",
-  color: "reactionKineticsMin",
+const DEFAULT_COLOR_SCALE = "RdYlGn_r";
+
+const DEFAULT_USER_VARIABLES = [
+  { name: "EP", value: "0.20" },
+];
+
+const UI = {
+  plot: document.getElementById("plot"),
+  status: document.getElementById("status"),
+  resultSummary: document.getElementById("result-summary"),
+  exportPlot: document.getElementById("export-plot"),
+  colorScale: document.getElementById("color-scale"),
+  rangeError: document.getElementById("range-settings-error"),
+  userVariableList: document.getElementById("user-variable-list"),
+  userVariableError: document.getElementById("user-variables-error"),
+  formulaSymbols: document.getElementById("formula-symbols"),
+  tableHead: document.getElementById("table-head"),
+  tableBody: document.getElementById("table-body"),
+  pageInfo: document.getElementById("page-info"),
+  previousPage: document.getElementById("previous-page"),
+  nextPage: document.getElementById("next-page"),
+  detailDialog: document.getElementById("detail-dialog"),
+  detailTitle: document.getElementById("detail-title"),
+  detailFields: document.getElementById("detail-fields"),
+  searchInput: document.getElementById("search-input"),
+  categoryFilter: document.getElementById("category-filter"),
+  methodFilter: document.getElementById("method-filter"),
+  resetFilters: document.getElementById("reset-filters"),
+  pageSize: document.getElementById("page-size"),
+  addVariable: document.getElementById("add-variable"),
+  closeDialog: document.getElementById("close-dialog"),
 };
+
+const MAPPING_CONTROLS = Object.fromEntries(MAPPING_NAMES.map(name => [name, {
+  expression: document.getElementById(`${name}-expression`),
+  expressionError: document.getElementById(`${name}-expression-error`),
+  title: document.getElementById(`${name}-title`),
+  min: document.getElementById(`${name}-min`),
+  max: document.getElementById(`${name}-max`),
+  log: AXIS_NAMES.includes(name) ? document.getElementById(`${name}-log`) : null,
+}]));
+
+const FORMULA_VARIABLES = [
+  { symbol: "T", field: "Capture temperature", label: "capture temperature", unit: "°C" },
+  { symbol: "P", field: "Total pressure", label: "total pressure", unit: "bar" },
+  { symbol: "CO2", field: "CO2 concentration", label: "CO₂ concentration", unit: "%" },
+  { symbol: "H", field: "Reaction Enthalpy", label: "reaction enthalpy", unit: "kJ/mol" },
+  { symbol: "C", field: "Maximum Capacity", label: "maximum capacity", unit: "mol/kg" },
+  { symbol: "t", field: "Reaction Kinetics", label: "reaction kinetics", unit: "min", parse: parseKinetics },
+  { symbol: "k", field: "Reaction Kinetics 2", label: "reaction kinetics 2", unit: "s⁻¹" },
+  { symbol: "S", field: "Cyclic Stability", label: "cyclic stability", unit: "%" },
+  { symbol: "N", field: "Maximum Cycles", label: "maximum cycles" },
+  { symbol: "Q", field: "Capacity at max cycle", label: "capacity at max cycle", unit: "%" },
+  { symbol: "V", field: "Viscosity", label: "viscosity", unit: "mPa·s" },
+  { symbol: "R", field: "Corrosivity", label: "corrosivity", unit: "µm/yr" },
+  { symbol: "VP", field: "Volatility", label: "volatility", unit: "kPa" },
+  { symbol: "M", field: "Sorbent Cost", label: "sorbent cost", unit: "$/kg", parse: parseSorbentCost },
+  { symbol: "SN2", field: "Selectivity (N2)", label: "selectivity (N₂)" },
+];
+
+const FORMULA_SYMBOLS = new Set(FORMULA_VARIABLES.map(variable => variable.symbol));
 
 function parseNum(value, stringsToRemove = []) {
   let text = String(value ?? "");
   for (const item of stringsToRemove) {
-    text = text.split(item).join("");
+    text = text.replaceAll(item, "");
   }
   const number = parseFloat(text.trim());
-  return Number.isNaN(number) ? null : number;
+  return Number.isFinite(number) ? number : null;
+}
+
+function parseSorbentCost(value) {
+  return parseNum(value, ["$", "/kg"]);
 }
 
 function parseKinetics(value) {
   if (value === null || value === undefined) return null;
 
   const text = String(value).trim().toLowerCase();
+  if (!text) return null;
   const directNumber = Number(text);
-  if (!Number.isNaN(directNumber)) return directNumber;
+  if (Number.isFinite(directNumber)) return directNumber;
 
   if (text.startsWith("k1a") || text.startsWith("kapp")) {
-    const match = text.match(/[0-9]+([.][0-9]+)?[ ]*(k)?/);
+    const match = text.match(/([0-9]+(?:[.][0-9]+)?)[ ]*(k)?/);
     if (!match) return null;
 
-    let rateConstant = parseFloat(match[0]);
+    let rateConstant = Number(match[1]);
     if (match[2]) rateConstant *= 1000;
 
     return rateConstant > 0 ? (2.3026 / rateConstant) / 60 : null;
   }
 
   return null;
+}
+
+const FORMULA_FUNCTIONS = {
+  min: { minArgs: 1, maxArgs: Infinity, evaluate: values => Math.min(...values) },
+  max: { minArgs: 1, maxArgs: Infinity, evaluate: values => Math.max(...values) },
+  abs: { minArgs: 1, maxArgs: 1, evaluate: values => Math.abs(values[0]) },
+  sqrt: { minArgs: 1, maxArgs: 1, evaluate: values => Math.sqrt(values[0]) },
+  log: { minArgs: 1, maxArgs: 1, evaluate: values => Math.log(values[0]) },
+  log10: { minArgs: 1, maxArgs: 1, evaluate: values => Math.log10(values[0]) },
+  exp: { minArgs: 1, maxArgs: 1, evaluate: values => Math.exp(values[0]) },
+  pow: { minArgs: 2, maxArgs: 2, evaluate: values => Math.pow(values[0], values[1]) },
+  if: { minArgs: 3, maxArgs: 3 },
+};
+
+function tokenizeFormula(expression) {
+  const normalized = expression.replaceAll("−", "-");
+  const tokens = [];
+  let position = 0;
+
+  while (position < normalized.length) {
+    const remaining = normalized.slice(position);
+    const character = normalized[position];
+
+    if (/\s/.test(character)) {
+      position += 1;
+      continue;
+    }
+
+    const numberMatch = remaining.match(/^(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+    if (numberMatch) {
+      tokens.push({ type: "number", value: Number(numberMatch[0]), position });
+      position += numberMatch[0].length;
+      continue;
+    }
+
+    const identifierMatch = remaining.match(/^[A-Za-z_][A-Za-z0-9_]*/);
+    if (identifierMatch) {
+      tokens.push({ type: "identifier", value: identifierMatch[0], position });
+      position += identifierMatch[0].length;
+      continue;
+    }
+
+    if ("+-*/^(),".includes(character)) {
+      tokens.push({ type: character, value: character, position });
+      position += 1;
+      continue;
+    }
+
+    throw new Error(`Unsupported character “${character}” at position ${position + 1}.`);
+  }
+
+  tokens.push({ type: "end", position: normalized.length });
+  return tokens;
+}
+
+class FormulaParser {
+  constructor(expression, additionalSymbols = []) {
+    this.tokens = tokenizeFormula(expression);
+    this.index = 0;
+    this.symbols = new Set([
+      ...FORMULA_SYMBOLS,
+      ...additionalSymbols,
+    ]);
+  }
+
+  current() {
+    return this.tokens[this.index];
+  }
+
+  take(type) {
+    if (this.current().type !== type) return null;
+    const token = this.current();
+    this.index += 1;
+    return token;
+  }
+
+  expect(type, message) {
+    const token = this.take(type);
+    if (token) return token;
+    throw new Error(`${message} (position ${this.current().position + 1}).`);
+  }
+
+  parse() {
+    if (this.current().type === "end") throw new Error("Enter an equation.");
+    const syntaxTree = this.parseAdditive();
+    if (this.current().type !== "end") {
+      throw new Error(`Unexpected “${this.current().value}” at position ${this.current().position + 1}.`);
+    }
+    return syntaxTree;
+  }
+
+  parseAdditive() {
+    let node = this.parseMultiplicative();
+    while (this.current().type === "+" || this.current().type === "-") {
+      const operator = this.current().type;
+      this.index += 1;
+      node = { type: "binary", operator, left: node, right: this.parseMultiplicative() };
+    }
+    return node;
+  }
+
+  parseMultiplicative() {
+    let node = this.parseUnary();
+    while (this.current().type === "*" || this.current().type === "/") {
+      const operator = this.current().type;
+      this.index += 1;
+      node = { type: "binary", operator, left: node, right: this.parseUnary() };
+    }
+    return node;
+  }
+
+  parseUnary() {
+    if (this.current().type === "+" || this.current().type === "-") {
+      const operator = this.current().type;
+      this.index += 1;
+      return { type: "unary", operator, value: this.parseUnary() };
+    }
+    return this.parsePower();
+  }
+
+  parsePower() {
+    const node = this.parsePrimary();
+    if (!this.take("^")) return node;
+    return { type: "binary", operator: "^", left: node, right: this.parseUnary() };
+  }
+
+  parsePrimary() {
+    const number = this.take("number");
+    if (number) return { type: "number", value: number.value };
+
+    const identifier = this.take("identifier");
+    if (identifier) {
+      if (this.take("(")) return this.parseFunction(identifier);
+      if (!this.symbols.has(identifier.value)) {
+        throw new Error(`Unknown symbol “${identifier.value}” at position ${identifier.position + 1}.`);
+      }
+      return { type: "variable", name: identifier.value };
+    }
+
+    if (this.take("(")) {
+      const node = this.parseAdditive();
+      this.expect(")", "Expected a closing parenthesis");
+      return node;
+    }
+
+    throw new Error(`Expected a number, symbol, or parenthesis at position ${this.current().position + 1}.`);
+  }
+
+  parseFunction(identifier) {
+    const definition = FORMULA_FUNCTIONS[identifier.value];
+    if (!definition) {
+      throw new Error(`Unknown function “${identifier.value}” at position ${identifier.position + 1}.`);
+    }
+
+    const argumentsList = [];
+    if (this.current().type !== ")") {
+      do {
+        argumentsList.push(this.parseAdditive());
+      } while (this.take(","));
+    }
+    this.expect(")", `Expected a closing parenthesis after ${identifier.value}`);
+
+    if (argumentsList.length < definition.minArgs || argumentsList.length > definition.maxArgs) {
+      const requirement = definition.minArgs === definition.maxArgs
+        ? definition.minArgs
+        : `at least ${definition.minArgs}`;
+      throw new Error(`${identifier.value} requires ${requirement} argument${definition.minArgs === 1 ? "" : "s"}.`);
+    }
+
+    return { type: "function", name: identifier.value, argumentsList };
+  }
+}
+
+function evaluateFormulaNode(node, context) {
+  if (node.type === "number") return node.value;
+  if (node.type === "variable") return context[node.name];
+
+  if (node.type === "unary") {
+    const value = evaluateFormulaNode(node.value, context);
+    return node.operator === "-" ? -value : value;
+  }
+
+  if (node.type === "binary") {
+    const left = evaluateFormulaNode(node.left, context);
+    const right = evaluateFormulaNode(node.right, context);
+    if (node.operator === "+") return left + right;
+    if (node.operator === "-") return left - right;
+    if (node.operator === "*") return left * right;
+    if (node.operator === "/") return left / right;
+    return Math.pow(left, right);
+  }
+
+  if (node.name === "if") {
+    const condition = evaluateFormulaNode(node.argumentsList[0], context);
+    if (!Number.isFinite(condition)) return NaN;
+    return evaluateFormulaNode(node.argumentsList[condition ? 1 : 2], context);
+  }
+
+  const values = node.argumentsList.map(argument => evaluateFormulaNode(argument, context));
+  return FORMULA_FUNCTIONS[node.name].evaluate(values);
+}
+
+const COMPILED_FORMULAS = new Map();
+
+function compileFormula(expression, additionalSymbols = []) {
+  const cacheKey = JSON.stringify([expression, [...additionalSymbols].sort()]);
+  if (COMPILED_FORMULAS.has(cacheKey)) return COMPILED_FORMULAS.get(cacheKey);
+
+  const syntaxTree = new FormulaParser(expression, additionalSymbols).parse();
+  const evaluate = context => evaluateFormulaNode(syntaxTree, context);
+  if (COMPILED_FORMULAS.size >= 100) COMPILED_FORMULAS.clear();
+  COMPILED_FORMULAS.set(cacheKey, evaluate);
+  return evaluate;
 }
 
 function parseCSV(text) {
@@ -738,68 +1234,26 @@ function parseCSV(text) {
   return result.data;
 }
 
-function createVisualizationRows(rows, priceKWh, includeMaterial) {
-  const priceEURPerKJ = priceKWh * MODEL.priceKJPerKWh;
+function createRecord(source) {
+  const formulaValues = Object.create(null);
 
-  return rows.map(source => {
-    const reactionEnthalpyKJPerMol = parseNum(source["Reaction Enthalpy"], ["kJ/mol"]);
-    const maximumCapacityMolPerKg = parseNum(source["Maximum Capacity"], ["mol/kg"]);
-    const sorbentCostPerKg = parseNum(source["Sorbent Cost"], ["$", "/kg"]);
+  for (const variable of FORMULA_VARIABLES) {
+    const value = variable.parse
+      ? variable.parse(source[variable.field])
+      : parseNum(source[variable.field]);
+    formulaValues[variable.symbol] = value ?? NaN;
+  }
 
-    let cyclesPerTon = null;
-    if (maximumCapacityMolPerKg !== null && maximumCapacityMolPerKg > 0) {
-      cyclesPerTon = MODEL.gramsPerTon /
-        MODEL.molarMassCO2GramPerMol /
-        maximumCapacityMolPerKg /
-        MODEL.sorbentMassKg /
-        MODEL.cyclesScaleFactor;
-    }
-
-    let energyGJPerTon = null;
-    let energyCostPerTon = null;
-    if (reactionEnthalpyKJPerMol !== null) {
-      const energyKJPerTon = MODEL.gramsPerTon /
-        MODEL.molarMassCO2GramPerMol *
-        reactionEnthalpyKJPerMol;
-      energyGJPerTon = energyKJPerTon / 1e6;
-      energyCostPerTon = energyKJPerTon * priceEURPerKJ;
-    }
-
-    let totalCostPerTon = null;
-    const hasMaterialCost = sorbentCostPerKg !== null || !includeMaterial;
-    if (energyCostPerTon !== null && cyclesPerTon !== null && hasMaterialCost) {
-      const materialCost = MODEL.sorbentMassKg * (sorbentCostPerKg ?? 0);
-      const materialCostPerTon = includeMaterial ? materialCost / cyclesPerTon : 0;
-      const clippedEnergyCostPerTon = Math.min(
-        Math.max(energyCostPerTon, 0),
-        MODEL.maxEnergyCostEUR
-      );
-      totalCostPerTon = clippedEnergyCostPerTon + materialCostPerTon;
-    }
-
-    return {
-      source,
-      name: source["Sorbent name"]?.trim() ?? "",
-      cyclesPerTon,
-      energyGJPerTon,
-      totalCostPerTon,
-      captureTemperature: parseNum(source["Capture temperature"]),
-      totalPressure: parseNum(source["Total pressure"]),
-      co2Concentration: parseNum(source["CO2 concentration"]),
-      reactionEnthalpyKJPerMol,
-      maximumCapacityMolPerKg,
-      reactionKineticsMin: parseKinetics(source["Reaction Kinetics"]),
-      cyclicStability: parseNum(source["Cyclic Stability"]),
-      maxCycles: parseNum(source["Maximum Cycles"]),
-      capacityAtMaxCycle: parseNum(source["Capacity at max cycle"]),
-      sorbentCostPerKg,
-    };
-  });
+  return {
+    source,
+    name: source["Sorbent name"]?.trim() ?? "",
+    searchText: Object.values(source).join(" ").toLowerCase(),
+    formulaValues,
+  };
 }
 
 function getPlotSize() {
-  const plot = document.getElementById("plot");
-  const rect = plot.getBoundingClientRect();
+  const rect = UI.plot.getBoundingClientRect();
   const size = Math.floor(Math.min(rect.width, rect.height));
 
   return {
@@ -808,95 +1262,242 @@ function getPlotSize() {
   };
 }
 
-function getParameter(key) {
-  return PLOT_PARAMETERS.find(parameter => parameter.key === key);
+function setFormulaError(mappingName, message = "") {
+  const { expression: input, expressionError: error } = MAPPING_CONTROLS[mappingName];
+  input.setAttribute("aria-invalid", message ? "true" : "false");
+  error.textContent = message;
+}
+
+function getUserVariables() {
+  const variables = Object.create(null);
+  const rows = document.querySelectorAll(".user-variable-row");
+  let firstError = "";
+
+  for (const row of rows) {
+    const nameInput = row.querySelector(".variable-name");
+    const valueInput = row.querySelector(".variable-value");
+    const name = nameInput.value.trim();
+    const rawValue = valueInput.value.trim();
+    let nameError = "";
+    let valueError = "";
+
+    if (!name) nameError = "Enter a variable name.";
+    else if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)) {
+      nameError = "Names must start with a letter or underscore and contain only letters, numbers, or underscores.";
+    } else if (FORMULA_SYMBOLS.has(name)) {
+      nameError = `“${name}” is already a table-data symbol.`;
+    } else if (Object.hasOwn(FORMULA_FUNCTIONS, name)) {
+      nameError = `“${name}” is a formula function name.`;
+    } else if (Object.hasOwn(variables, name)) {
+      nameError = `“${name}” is defined more than once.`;
+    }
+
+    const value = Number(rawValue);
+    if (!rawValue || !Number.isFinite(value)) valueError = "Enter a finite numeric value.";
+
+    nameInput.setAttribute("aria-invalid", nameError ? "true" : "false");
+    valueInput.setAttribute("aria-invalid", valueError ? "true" : "false");
+    if (!firstError) firstError = nameError || valueError;
+    if (!nameError && !valueError) variables[name] = value;
+  }
+
+  UI.userVariableError.textContent = firstError;
+  if (firstError) throw new Error(`User variable error: ${firstError}`);
+  return variables;
+}
+
+function getMappingRange(mappingName, axisType) {
+  const { min: minInput, max: maxInput } = MAPPING_CONTROLS[mappingName];
+  const minRaw = minInput.value.trim();
+  const maxRaw = maxInput.value.trim();
+  const min = minRaw === "" ? null : Number(minRaw);
+  const max = maxRaw === "" ? null : Number(maxRaw);
+  let minInvalid = minInput.validity.badInput || (min !== null && !Number.isFinite(min));
+  let maxInvalid = maxInput.validity.badInput || (max !== null && !Number.isFinite(max));
+  let error = "";
+
+  if (minInvalid || maxInvalid) {
+    error = `${mappingName.toUpperCase()} limits must be finite numbers.`;
+  } else if (axisType === "log" && ((min !== null && min <= 0) || (max !== null && max <= 0))) {
+    minInvalid = min !== null && min <= 0;
+    maxInvalid = max !== null && max <= 0;
+    error = `${mappingName.toUpperCase()} logarithmic limits must be greater than zero.`;
+  } else if (min !== null && max !== null && min >= max) {
+    minInvalid = true;
+    maxInvalid = true;
+    error = `${mappingName.toUpperCase()} minimum must be less than its maximum.`;
+  }
+
+  minInput.setAttribute("aria-invalid", minInvalid ? "true" : "false");
+  maxInput.setAttribute("aria-invalid", maxInvalid ? "true" : "false");
+  return { min, max, error };
 }
 
 function getPlotMappings() {
-  return {
-    x: getParameter(document.getElementById("x-parameter").value),
-    y: getParameter(document.getElementById("y-parameter").value),
-    z: getParameter(document.getElementById("z-parameter").value),
-    size: getParameter(document.getElementById("size-parameter").value),
-    color: getParameter(document.getElementById("color-parameter").value),
-  };
+  const mappings = {};
+  let firstError = null;
+  let rangeError = "";
+  const userVariables = getUserVariables();
+  const userSymbols = Object.keys(userVariables);
+
+  for (const mappingName of MAPPING_NAMES) {
+    const controls = MAPPING_CONTROLS[mappingName];
+    const expression = controls.expression.value.trim();
+    const axisType = controls.log ? (controls.log.checked ? "log" : "linear") : null;
+    const range = getMappingRange(mappingName, axisType);
+    if (range.error && !rangeError) rangeError = range.error;
+    if (range.error && !firstError) firstError = new Error(range.error);
+
+    try {
+      mappings[mappingName] = {
+        expression,
+        evaluate: compileFormula(expression, userSymbols),
+        title: controls.title.value.trim(),
+        min: range.min,
+        max: range.max,
+      };
+      if (axisType) mappings[mappingName].axisType = axisType;
+      setFormulaError(mappingName);
+    } catch (error) {
+      setFormulaError(mappingName, error.message);
+      if (!firstError) firstError = error;
+    }
+  }
+
+  UI.rangeError.textContent = rangeError;
+  if (firstError) throw firstError;
+  mappings.color.colorScale = COLOR_SCALES.find(
+    scale => scale.value === UI.colorScale.value
+  ) ?? COLOR_SCALES[0];
+  mappings.userVariables = userVariables;
+  return mappings;
 }
 
 function createPlotPoints(rows, mappings) {
-  return rows
-    .filter(row => {
-      for (const mapping of Object.values(mappings)) {
-        const value = row[mapping.key];
-        if (!Number.isFinite(value)) return false;
-        if (mapping.axisType === "log" && value <= 0) return false;
-        if (mapping.colorTransform === "log" && value <= 0) return false;
-      }
-      return true;
-    })
-    .map(row => ({
+  const points = [];
+
+  for (const row of rows) {
+    const context = { ...row.formulaValues, ...mappings.userVariables };
+
+    const x = mappings.x.evaluate(context);
+    const y = mappings.y.evaluate(context);
+    const z = mappings.z.evaluate(context);
+    const sizeValue = mappings.size.evaluate(context);
+    const colorValue = mappings.color.evaluate(context);
+    if (![x, y, z, sizeValue, colorValue].every(Number.isFinite)) continue;
+    if (mappings.x.axisType === "log" && x <= 0) continue;
+    if (mappings.y.axisType === "log" && y <= 0) continue;
+    if (mappings.z.axisType === "log" && z <= 0) continue;
+
+    points.push({
       name: row.name,
-      x: row[mappings.x.key],
-      y: row[mappings.y.key],
-      z: row[mappings.z.key],
-      sizeValue: row[mappings.size.key],
-      colorValue: row[mappings.color.key],
-    }));
+      x,
+      y,
+      z,
+      sizeValue,
+      colorValue,
+    });
+  }
+
+  return points;
 }
 
-function scaleMarkerSizes(values) {
+function resolveScaleRange(values, minimum, maximum, positive = false) {
+  let dataMin = positive ? 1 : 0;
+  let dataMax = positive ? 10 : 1;
+
+  if (values.length > 0) {
+    dataMin = values[0];
+    dataMax = values[0];
+    for (let index = 1; index < values.length; index += 1) {
+      dataMin = Math.min(dataMin, values[index]);
+      dataMax = Math.max(dataMax, values[index]);
+    }
+  }
+
+  let min = minimum ?? dataMin;
+  let max = maximum ?? dataMax;
+
+  if (min >= max) {
+    if (minimum !== null && maximum === null) {
+      max = positive ? min * 10 : min + Math.max(Math.abs(min) * 0.1, 1);
+    } else if (minimum === null && maximum !== null) {
+      min = positive ? max / 10 : max - Math.max(Math.abs(max) * 0.1, 1);
+    } else {
+      const padding = Math.max(Math.abs(min) * 0.05, 0.5);
+      min -= padding;
+      max += padding;
+    }
+  }
+
+  return { min, max };
+}
+
+function scaleMarkerSizes(values, mapping) {
   if (values.length === 0) return [];
 
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  if (min === max) return values.map(() => (MARKER.minSize + MARKER.maxSize) / 2);
+  const { min, max } = resolveScaleRange(values, mapping.min, mapping.max);
 
   return values.map(value => {
-    const normalized = (value - min) / (max - min);
-    return MARKER.minSize + Math.sqrt(Math.max(0, normalized)) * (MARKER.maxSize - MARKER.minSize);
+    const normalized = Math.min(Math.max((value - min) / (max - min), 0), 1);
+    return MARKER.minSize + Math.sqrt(normalized) * (MARKER.maxSize - MARKER.minSize);
   });
 }
 
-function makeAxisConfig(mapping, title, axisName) {
+function makeAxisConfig(mapping, axisName, values) {
   const config = {
-    title: { text: title || mapping.axisTitle, font: { size: 14 } },
-    type: mapping.axisType ?? "linear",
-    showbackground: true,
-    backgroundcolor: "#1a1a1a",
+    title: { text: mapping.title || mapping.expression, font: { size: 14 } },
+    type: mapping.axisType,
+    showbackground: false,
+    backgroundcolor: TRANSPARENT,
     gridcolor: "#444",
     zerolinecolor: "#555",
     tickfont: { color: "#ccc", size: 12 },
     titlefont: { color: "#ccc", size: 14 },
   };
 
-  if (axisName === "x" && mapping.key === DEFAULT_MAPPINGS.x) {
-    config.range = AXIS.xLogRange;
-    config.tickmode = "array";
-    config.tickvals = AXIS.xTickVals;
-    config.ticktext = AXIS.xTickText;
+  if (mapping.min !== null || mapping.max !== null) {
+    const range = resolveScaleRange(values, mapping.min, mapping.max, mapping.axisType === "log");
+    config.range = mapping.axisType === "log"
+      ? [Math.log10(range.min), Math.log10(range.max)]
+      : [range.min, range.max];
   }
-  if (axisName === "y" && mapping.key === DEFAULT_MAPPINGS.y) config.dtick = 2;
-  if (axisName === "z" && mapping.key === DEFAULT_MAPPINGS.z) {
-    config.range = AXIS.zRange;
-    config.dtick = 50;
+  if (axisName === "y" && mapping.expression === DEFAULT_MAPPINGS.y.expression && mapping.axisType === "linear") {
+    config.dtick = 2;
   }
-
   return config;
 }
 
 function makeFigure(points, mappings) {
-  const names = points.map(point => point.name);
-  const xs = points.map(point => point.x);
-  const ys = points.map(point => point.y);
-  const zs = points.map(point => point.z);
-  const sizes = scaleMarkerSizes(points.map(point => point.sizeValue));
-  const rawColors = points.map(point => point.colorValue);
-  const colors = mappings.color.colorTransform === "log"
-    ? rawColors.map(value => Math.log10(value))
-    : rawColors;
-  const minColor = colors.length > 0 ? Math.min(...colors) : 0;
-  const maxColor = colors.length > 0 ? Math.max(...colors) : 1;
+  const names = [];
+  const xs = [];
+  const ys = [];
+  const zs = [];
+  const sizeValues = [];
+  const colors = [];
+  const customdata = [];
+
+  for (const point of points) {
+    names.push(point.name);
+    xs.push(point.x);
+    ys.push(point.y);
+    zs.push(point.z);
+    sizeValues.push(point.sizeValue);
+    colors.push(point.colorValue);
+    customdata.push([point.sizeValue, point.colorValue]);
+  }
+
+  const sizes = scaleMarkerSizes(sizeValues, mappings.size);
+  const colorRange = resolveScaleRange(colors, mappings.color.min, mappings.color.max);
+  const hoverLabels = Object.fromEntries(MAPPING_NAMES.map(mappingName => [
+    mappingName,
+    (mappings[mappingName].title || mappings[mappingName].expression)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;"),
+  ]));
   const colorbar = {
-    title: { text: mappings.color.label, side: "right" },
+    title: { text: mappings.color.title || mappings.color.expression, side: "right" },
     x: 0.92,
     y: 0.5,
     len: 0.5,
@@ -905,11 +1506,6 @@ function makeFigure(points, mappings) {
     titlefont: { color: "#ddd", size: 14 },
   };
 
-  if (mappings.color.colorTransform === "log") {
-    colorbar.tickvals = COLORBAR.tickValuesMin.map(value => Math.log10(value));
-    colorbar.ticktext = COLORBAR.tickValuesMin.map(String);
-  }
-
   const trace = {
     type: "scatter3d",
     mode: "markers",
@@ -917,15 +1513,14 @@ function makeFigure(points, mappings) {
     y: ys,
     z: zs,
     text: names,
-    customdata: points.map(point => [point.sizeValue, point.colorValue]),
-    hovertemplate: `<b>%{text}</b><br>${mappings.x.label}: %{x:.3g}<br>${mappings.y.label}: %{y:.3g}<br>${mappings.z.label}: %{z:.3g}<br>${mappings.size.label}: %{customdata[0]:.3g}<br>${mappings.color.label}: %{customdata[1]:.3g}<extra></extra>`,
+    customdata,
+    hovertemplate: `<b>%{text}</b><br>${hoverLabels.x}: %{x:.3g}<br>${hoverLabels.y}: %{y:.3g}<br>${hoverLabels.z}: %{z:.3g}<br>${hoverLabels.size}: %{customdata[0]:.3g}<br>${hoverLabels.color}: %{customdata[1]:.3g}<extra></extra>`,
     marker: {
       size: sizes,
       color: colors,
-      colorscale: "RdYlGn",
-      reversescale: true,
-      cmin: minColor,
-      cmax: minColor === maxColor ? minColor + 1 : maxColor,
+      colorscale: mappings.color.colorScale.colors,
+      cmin: colorRange.min,
+      cmax: colorRange.max,
       colorbar,
       opacity: MARKER.opacity,
       line: { width: 0.5, color: "#fff" },
@@ -934,26 +1529,26 @@ function makeFigure(points, mappings) {
 
   const plotSize = getPlotSize();
   const layout = {
-    paper_bgcolor: "#111",
-    plot_bgcolor: "#111",
+    paper_bgcolor: TRANSPARENT,
+    plot_bgcolor: TRANSPARENT,
     font: { color: "#ddd", size: 14, family: "Arial" },
     margin: { l: 0, r: 0, t: 30, b: 0 },
     width: plotSize.width,
     height: plotSize.height,
     scene: {
-      bgcolor: "#111",
+      bgcolor: TRANSPARENT,
       aspectmode: "cube",
       domain: { x: [0, 0.88], y: [0, 1] },
-      xaxis: makeAxisConfig(mappings.x, document.getElementById("x-title").value.trim(), "x"),
-      yaxis: makeAxisConfig(mappings.y, document.getElementById("y-title").value.trim(), "y"),
-      zaxis: makeAxisConfig(mappings.z, document.getElementById("z-title").value.trim(), "z"),
+      xaxis: makeAxisConfig(mappings.x, "x", xs),
+      yaxis: makeAxisConfig(mappings.y, "y", ys),
+      zaxis: makeAxisConfig(mappings.z, "z", zs),
     },
     scene_camera: CAMERA,
   };
 
   if (points.length === 0) {
     layout.annotations = [{
-      text: "No filtered records have values for all selected plot mappings.",
+      text: "No filtered records have usable values for all equations and marker mappings.",
       showarrow: false,
       x: 0.45,
       y: 0.5,
@@ -966,79 +1561,135 @@ function makeFigure(points, mappings) {
   return { trace, layout };
 }
 
-let allRows = [];
-let filteredRows = [];
-let currentPage = 1;
-let currentPageSize = PAGE_SIZE;
-let sortState = { key: "Sorbent name", direction: 1 };
+const state = {
+  records: [],
+  filteredRecords: [],
+  sortedRecords: [],
+  currentPage: 1,
+  pageSize: PAGE_SIZE,
+  sort: { key: "Sorbent name", direction: 1 },
+};
 
-function initializePlotControls() {
-  const controls = {
-    "x-parameter": DEFAULT_MAPPINGS.x,
-    "y-parameter": DEFAULT_MAPPINGS.y,
-    "z-parameter": DEFAULT_MAPPINGS.z,
-    "size-parameter": DEFAULT_MAPPINGS.size,
-    "color-parameter": DEFAULT_MAPPINGS.color,
-  };
+function addUserVariable(name = "", value = "") {
+  const row = document.createElement("div");
+  const nameInput = document.createElement("input");
+  const valueInput = document.createElement("input");
+  const removeButton = document.createElement("button");
 
-  for (const [selectId, defaultValue] of Object.entries(controls)) {
-    const select = document.getElementById(selectId);
-    for (const parameter of PLOT_PARAMETERS) {
-      const option = document.createElement("option");
-      option.value = parameter.key;
-      option.textContent = parameter.label;
-      select.appendChild(option);
-    }
-    select.value = defaultValue;
-  }
+  row.className = "user-variable-row";
+  nameInput.type = "text";
+  nameInput.className = "variable-name";
+  nameInput.value = name;
+  nameInput.placeholder = "Name";
+  nameInput.autocomplete = "off";
+  nameInput.spellcheck = false;
+  nameInput.setAttribute("aria-label", "User variable name");
 
-  for (const axis of ["x", "y", "z"]) {
-    document.getElementById(`${axis}-title`).value = getParameter(DEFAULT_MAPPINGS[axis]).label;
-  }
+  valueInput.type = "number";
+  valueInput.className = "variable-value";
+  valueInput.value = value;
+  valueInput.step = "any";
+  valueInput.placeholder = "Value";
+  valueInput.setAttribute("aria-label", `Value for ${name || "user variable"}`);
+
+  removeButton.type = "button";
+  removeButton.className = "remove-variable";
+  removeButton.textContent = "×";
+  removeButton.setAttribute("aria-label", `Remove ${name || "user variable"}`);
+
+  nameInput.addEventListener("input", () => {
+    valueInput.setAttribute("aria-label", `Value for ${nameInput.value.trim() || "user variable"}`);
+    schedulePlotRender();
+  });
+  valueInput.addEventListener("input", schedulePlotRender);
+  removeButton.addEventListener("click", () => {
+    row.remove();
+    schedulePlotRender();
+  });
+
+  row.append(nameInput, valueInput, removeButton);
+  UI.userVariableList.appendChild(row);
+  return nameInput;
 }
 
-function populateSelect(selectId, values) {
-  const select = document.getElementById(selectId);
+function initializePlotControls() {
+  for (const variable of DEFAULT_USER_VARIABLES) {
+    addUserVariable(variable.name, variable.value);
+  }
+
+  for (const mappingName of MAPPING_NAMES) {
+    const defaults = DEFAULT_MAPPINGS[mappingName];
+    const controls = MAPPING_CONTROLS[mappingName];
+    controls.expression.value = defaults.expression;
+    controls.title.value = defaults.title;
+    controls.min.value = defaults.min;
+    controls.max.value = defaults.max;
+    if (controls.log) controls.log.checked = defaults.axisType === "log";
+  }
+
+  const colorScaleOptions = document.createDocumentFragment();
+  for (const scale of COLOR_SCALES) {
+    const option = document.createElement("option");
+    option.value = scale.value;
+    option.textContent = scale.label;
+    colorScaleOptions.appendChild(option);
+  }
+  UI.colorScale.appendChild(colorScaleOptions);
+  UI.colorScale.value = DEFAULT_COLOR_SCALE;
+
+  const symbolRows = document.createDocumentFragment();
+  for (const variable of FORMULA_VARIABLES) {
+    const row = document.createElement("tr");
+    const symbolCell = document.createElement("td");
+    const descriptionCell = document.createElement("td");
+    const symbol = document.createElement("code");
+    symbol.textContent = variable.symbol;
+    symbolCell.appendChild(symbol);
+    descriptionCell.textContent = `${variable.label}${variable.unit ? ` (${variable.unit})` : ""}`;
+    row.append(symbolCell, descriptionCell);
+    symbolRows.appendChild(row);
+  }
+  UI.formulaSymbols.appendChild(symbolRows);
+}
+
+function populateSelect(select, values) {
   const options = [...new Set(values.map(value => value.trim()).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+  const fragment = document.createDocumentFragment();
 
   for (const value of options) {
     const option = document.createElement("option");
     option.value = value;
     option.textContent = value;
-    select.appendChild(option);
+    fragment.appendChild(option);
   }
+  select.appendChild(fragment);
 }
 
 function initializeFilters() {
-  populateSelect("category-filter", allRows.map(row => row["Sorbent category"] ?? ""));
-  populateSelect("method-filter", allRows.map(row => row["Capture method"] ?? ""));
+  populateSelect(UI.categoryFilter, state.records.map(record => record.source["Sorbent category"] ?? ""));
+  populateSelect(UI.methodFilter, state.records.map(record => record.source["Capture method"] ?? ""));
 }
 
-function getFilteredRows() {
-  const searchTerm = document.getElementById("search-input").value.trim().toLowerCase();
-  const category = document.getElementById("category-filter").value;
-  const method = document.getElementById("method-filter").value;
+function getFilteredRecords() {
+  const searchTerm = UI.searchInput.value.trim().toLowerCase();
+  const category = UI.categoryFilter.value;
+  const method = UI.methodFilter.value;
 
-  return allRows.filter(row => {
+  return state.records.filter(record => {
+    const row = record.source;
     if (category && row["Sorbent category"]?.trim() !== category) return false;
     if (method && row["Capture method"]?.trim() !== method) return false;
-
-    if (searchTerm) {
-      const searchableText = Object.values(row).join(" ").toLowerCase();
-      if (!searchableText.includes(searchTerm)) return false;
-    }
-
-    return true;
+    return !searchTerm || record.searchText.includes(searchTerm);
   });
 }
 
-function sortRows(rows) {
-  const column = TABLE_COLUMNS.find(item => item.key === sortState.key);
+function sortRecords(records) {
+  const column = TABLE_COLUMNS_BY_KEY.get(state.sort.key);
 
-  return [...rows].sort((a, b) => {
-    const rawA = String(a[sortState.key] ?? "").trim();
-    const rawB = String(b[sortState.key] ?? "").trim();
+  return [...records].sort((a, b) => {
+    const rawA = String(a.source[state.sort.key] ?? "").trim();
+    const rawB = String(b.source[state.sort.key] ?? "").trim();
 
     if (!rawA && !rawB) return 0;
     if (!rawA) return 1;
@@ -1052,46 +1703,45 @@ function sortRows(rows) {
     }
 
     if (comparison === undefined) {
-      comparison = rawA.localeCompare(rawB, undefined, {
-        numeric: true,
-        sensitivity: "base",
-      });
+      comparison = SORT_COLLATOR.compare(rawA, rawB);
     }
 
-    return comparison * sortState.direction;
+    return comparison * state.sort.direction;
   });
 }
 
 function renderTableHeader() {
-  const tableHead = document.getElementById("table-head");
-  tableHead.replaceChildren();
+  const fragment = document.createDocumentFragment();
 
   for (const column of TABLE_COLUMNS) {
     const header = document.createElement("th");
     const button = document.createElement("button");
-    const active = sortState.key === column.key;
-    const indicator = active ? (sortState.direction === 1 ? " ▲" : " ▼") : "";
+    const active = state.sort.key === column.key;
+    const indicator = active ? (state.sort.direction === 1 ? " ▲" : " ▼") : "";
 
     button.type = "button";
     button.textContent = column.label + indicator;
-    button.setAttribute("aria-label", `Sort by ${column.label}${active ? (sortState.direction === 1 ? ", ascending" : ", descending") : ""}`);
+    button.setAttribute("aria-label", `Sort by ${column.label}${active ? (state.sort.direction === 1 ? ", ascending" : ", descending") : ""}`);
     button.addEventListener("click", () => {
-      if (sortState.key === column.key) {
-        sortState.direction *= -1;
+      if (state.sort.key === column.key) {
+        state.sort.direction *= -1;
       } else {
-        sortState = { key: column.key, direction: 1 };
+        state.sort = { key: column.key, direction: 1 };
       }
-      currentPage = 1;
+      state.currentPage = 1;
+      state.sortedRecords = sortRecords(state.filteredRecords);
+      renderTableHeader();
       renderTable();
     });
 
     header.appendChild(button);
-    tableHead.appendChild(header);
+    fragment.appendChild(header);
   }
 
   const actionHeader = document.createElement("th");
   actionHeader.textContent = "All fields";
-  tableHead.appendChild(actionHeader);
+  fragment.appendChild(actionHeader);
+  UI.tableHead.replaceChildren(fragment);
 }
 
 function appendCell(rowElement, value, className = "") {
@@ -1104,12 +1754,10 @@ function appendCell(rowElement, value, className = "") {
 }
 
 function openDetails(row) {
-  const dialog = document.getElementById("detail-dialog");
-  const fields = document.getElementById("detail-fields");
   const name = row["Sorbent name"]?.trim() || "Sorbent details";
+  const fragment = document.createDocumentFragment();
 
-  document.getElementById("detail-title").textContent = name;
-  fields.replaceChildren();
+  UI.detailTitle.textContent = name;
 
   for (const [key, rawValue] of Object.entries(row)) {
     if (key === "__parsed_extra") continue;
@@ -1123,26 +1771,26 @@ function openDetails(row) {
     description.textContent = value || "Not reported";
     if (!value) description.classList.add("empty-value");
 
-    fields.append(term, description);
+    fragment.append(term, description);
   }
 
-  dialog.showModal();
+  UI.detailFields.replaceChildren(fragment);
+  UI.detailDialog.showModal();
 }
 
 function renderTable() {
-  const sortedRows = sortRows(filteredRows);
-  const effectivePageSize = currentPageSize === Infinity
-    ? Math.max(1, sortedRows.length)
-    : currentPageSize;
-  const totalPages = Math.max(1, Math.ceil(sortedRows.length / effectivePageSize));
-  currentPage = Math.min(currentPage, totalPages);
+  const effectivePageSize = state.pageSize === Infinity
+    ? Math.max(1, state.sortedRecords.length)
+    : state.pageSize;
+  const totalPages = Math.max(1, Math.ceil(state.sortedRecords.length / effectivePageSize));
+  state.currentPage = Math.min(state.currentPage, totalPages);
 
-  const start = (currentPage - 1) * effectivePageSize;
-  const pageRows = sortedRows.slice(start, start + effectivePageSize);
-  const tableBody = document.getElementById("table-body");
-  tableBody.replaceChildren();
+  const start = (state.currentPage - 1) * effectivePageSize;
+  const pageRecords = state.sortedRecords.slice(start, start + effectivePageSize);
+  const fragment = document.createDocumentFragment();
 
-  for (const row of pageRows) {
+  for (const record of pageRecords) {
+    const row = record.source;
     const rowElement = document.createElement("tr");
 
     for (const column of TABLE_COLUMNS) {
@@ -1158,127 +1806,188 @@ function renderTable() {
     detailsButton.addEventListener("click", () => openDetails(row));
     actionCell.appendChild(detailsButton);
     rowElement.appendChild(actionCell);
-    tableBody.appendChild(rowElement);
+    fragment.appendChild(rowElement);
   }
 
-  if (pageRows.length === 0) {
+  if (pageRecords.length === 0) {
     const rowElement = document.createElement("tr");
     const cell = document.createElement("td");
     cell.colSpan = TABLE_COLUMNS.length + 1;
     cell.className = "empty-value";
     cell.textContent = "No records match the current filters.";
     rowElement.appendChild(cell);
-    tableBody.appendChild(rowElement);
+    fragment.appendChild(rowElement);
   }
 
-  renderTableHeader();
-  document.getElementById("page-info").textContent = currentPageSize === Infinity
-    ? `${sortedRows.length} rows`
-    : `Page ${currentPage} of ${totalPages}`;
-  document.getElementById("previous-page").disabled = currentPageSize === Infinity || currentPage <= 1;
-  document.getElementById("next-page").disabled = currentPageSize === Infinity || currentPage >= totalPages;
+  UI.tableBody.replaceChildren(fragment);
+  UI.pageInfo.textContent = state.pageSize === Infinity
+    ? `${state.sortedRecords.length} rows`
+    : `Page ${state.currentPage} of ${totalPages}`;
+  UI.previousPage.disabled = state.pageSize === Infinity || state.currentPage <= 1;
+  UI.nextPage.disabled = state.pageSize === Infinity || state.currentPage >= totalPages;
+}
+
+let plotRenderFrame = null;
+
+function schedulePlotRender() {
+  if (plotRenderFrame !== null) cancelAnimationFrame(plotRenderFrame);
+  plotRenderFrame = requestAnimationFrame(() => {
+    plotRenderFrame = null;
+    renderPlot();
+  });
 }
 
 function renderPlot() {
-  if (allRows.length === 0) return;
+  if (plotRenderFrame !== null) {
+    cancelAnimationFrame(plotRenderFrame);
+    plotRenderFrame = null;
+  }
+  if (state.records.length === 0) return;
 
-  const priceSlider = document.getElementById("price-slider");
-  const priceKWh = parseFloat(priceSlider.value);
-  const includeMaterial = document.getElementById("include-mat").checked;
-  const mappings = getPlotMappings();
-  const visualizationRows = createVisualizationRows(filteredRows, priceKWh, includeMaterial);
-  const points = createPlotPoints(visualizationRows, mappings);
+  let mappings;
+  try {
+    mappings = getPlotMappings();
+  } catch (error) {
+    UI.status.textContent = `Plot setting error: ${error.message}`;
+    UI.resultSummary.textContent =
+      `Showing ${state.filteredRecords.length} of ${state.records.length} records. Fix the highlighted plot setting to update the 3D plot.`;
+    return;
+  }
 
-  document.getElementById("price-val").textContent = priceKWh.toFixed(2) + " €/kWh";
+  const points = createPlotPoints(state.filteredRecords, mappings);
 
   const { trace, layout } = makeFigure(points, mappings);
-  Plotly.react("plot", [trace], layout, {
-    responsive: true,
+  Plotly.react(UI.plot, [trace], layout, {
     displayModeBar: true,
   });
+  UI.exportPlot.disabled = false;
 
-  document.getElementById("status").textContent =
-    `${filteredRows.length} matching records; ${points.length} have the values required for this plot.`;
-  document.getElementById("result-summary").textContent =
-    `Showing ${filteredRows.length} of ${allRows.length} records. ${points.length} are represented in the 3D plot with the current settings.`;
+  UI.status.textContent =
+    `${state.filteredRecords.length} matching records; ${points.length} have the values required for this plot.`;
+  UI.resultSummary.textContent =
+    `Showing ${state.filteredRecords.length} of ${state.records.length} records. ${points.length} are represented in the 3D plot with the current settings.`;
+}
+
+async function exportPlot() {
+  const button = UI.exportPlot;
+  const originalLabel = button.textContent;
+  const plotSize = getPlotSize();
+  button.disabled = true;
+  button.textContent = "Exporting…";
+
+  try {
+    await Plotly.downloadImage(UI.plot, {
+      format: "svg",
+      filename: "co2-sorbents-plot",
+      width: plotSize.width,
+      height: plotSize.height,
+    });
+  } catch (error) {
+    UI.status.textContent = "Could not export the plot: " + error.message;
+    console.error(error);
+  } finally {
+    button.disabled = false;
+    button.textContent = originalLabel;
+  }
 }
 
 function renderAll({ resetPage = false } = {}) {
-  if (resetPage) currentPage = 1;
-  filteredRows = getFilteredRows();
+  if (filterRenderFrame !== null) {
+    cancelAnimationFrame(filterRenderFrame);
+    filterRenderFrame = null;
+  }
+  if (resetPage) state.currentPage = 1;
+  state.filteredRecords = getFilteredRecords();
+  state.sortedRecords = sortRecords(state.filteredRecords);
   renderTable();
   renderPlot();
 }
 
-async function loadData() {
-  const status = document.getElementById("status");
+let filterRenderFrame = null;
 
+function scheduleFilterRender() {
+  if (filterRenderFrame !== null) cancelAnimationFrame(filterRenderFrame);
+  filterRenderFrame = requestAnimationFrame(() => {
+    filterRenderFrame = null;
+    renderAll({ resetPage: true });
+  });
+}
+
+async function loadData() {
   try {
     const response = await fetch(CSV_URL);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const text = await response.text();
-    const rows = parseCSV(text);
-    allRows = rows.filter(row => row["Sorbent name"]?.trim());
+    state.records = parseCSV(text)
+      .filter(row => row["Sorbent name"]?.trim())
+      .map(createRecord);
 
     initializeFilters();
+    renderTableHeader();
     renderAll({ resetPage: true });
   } catch (error) {
     const localHint = window.location.protocol === "file:"
       ? " Open this page through a local web server instead of file://."
       : "";
-    status.textContent = "Error loading data: " + error.message + localHint;
+    UI.status.textContent = "Error loading data: " + error.message + localHint;
     console.error(error);
   }
 }
 
-function resizePlot() {
-  if (allRows.length === 0) return;
+let plotResizeFrame = null;
 
-  const plotSize = getPlotSize();
-  Plotly.relayout("plot", plotSize);
+function schedulePlotResize() {
+  if (plotResizeFrame !== null) cancelAnimationFrame(plotResizeFrame);
+  plotResizeFrame = requestAnimationFrame(() => {
+    plotResizeFrame = null;
+    if (state.records.length === 0) return;
+    Plotly.relayout(UI.plot, getPlotSize());
+  });
 }
 
-document.getElementById("search-input").addEventListener("input", () => renderAll({ resetPage: true }));
-document.getElementById("category-filter").addEventListener("change", () => renderAll({ resetPage: true }));
-document.getElementById("method-filter").addEventListener("change", () => renderAll({ resetPage: true }));
-document.getElementById("reset-filters").addEventListener("click", () => {
-  document.getElementById("search-input").value = "";
-  document.getElementById("category-filter").value = "";
-  document.getElementById("method-filter").value = "";
+UI.searchInput.addEventListener("input", scheduleFilterRender);
+UI.categoryFilter.addEventListener("change", () => renderAll({ resetPage: true }));
+UI.methodFilter.addEventListener("change", () => renderAll({ resetPage: true }));
+UI.resetFilters.addEventListener("click", () => {
+  UI.searchInput.value = "";
+  UI.categoryFilter.value = "";
+  UI.methodFilter.value = "";
   renderAll({ resetPage: true });
 });
-document.getElementById("previous-page").addEventListener("click", () => {
-  currentPage -= 1;
+UI.previousPage.addEventListener("click", () => {
+  state.currentPage -= 1;
   renderTable();
 });
-document.getElementById("next-page").addEventListener("click", () => {
-  currentPage += 1;
+UI.nextPage.addEventListener("click", () => {
+  state.currentPage += 1;
   renderTable();
 });
-document.getElementById("page-size").addEventListener("change", event => {
-  currentPageSize = event.target.value === "all" ? Infinity : parseInt(event.target.value, 10);
-  currentPage = 1;
+UI.pageSize.addEventListener("change", event => {
+  state.pageSize = event.target.value === "all" ? Infinity : parseInt(event.target.value, 10);
+  state.currentPage = 1;
   renderTable();
 });
-document.getElementById("price-slider").addEventListener("input", renderPlot);
-document.getElementById("include-mat").addEventListener("change", renderPlot);
-for (const axis of ["x", "y", "z"]) {
-  document.getElementById(`${axis}-parameter`).addEventListener("change", event => {
-    document.getElementById(`${axis}-title`).value = getParameter(event.target.value).label;
-    renderPlot();
-  });
-  document.getElementById(`${axis}-title`).addEventListener("input", renderPlot);
+for (const mappingName of MAPPING_NAMES) {
+  const controls = MAPPING_CONTROLS[mappingName];
+  controls.expression.addEventListener("input", schedulePlotRender);
+  controls.title.addEventListener("input", schedulePlotRender);
+  controls.min.addEventListener("input", schedulePlotRender);
+  controls.max.addEventListener("input", schedulePlotRender);
+  controls.log?.addEventListener("change", schedulePlotRender);
 }
-document.getElementById("size-parameter").addEventListener("change", renderPlot);
-document.getElementById("color-parameter").addEventListener("change", renderPlot);
-document.getElementById("close-dialog").addEventListener("click", () => {
-  document.getElementById("detail-dialog").close();
+UI.colorScale.addEventListener("change", schedulePlotRender);
+UI.exportPlot.addEventListener("click", exportPlot);
+UI.addVariable.addEventListener("click", () => {
+  addUserVariable().focus();
 });
-document.getElementById("detail-dialog").addEventListener("click", event => {
+UI.closeDialog.addEventListener("click", () => {
+  UI.detailDialog.close();
+});
+UI.detailDialog.addEventListener("click", event => {
   if (event.target === event.currentTarget) event.currentTarget.close();
 });
-window.addEventListener("resize", resizePlot);
+window.addEventListener("resize", schedulePlotResize);
 
 initializePlotControls();
 loadData();

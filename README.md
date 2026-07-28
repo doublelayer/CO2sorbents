@@ -4,8 +4,15 @@ An interactive tool for comparing and exploring sorbents for emerging CO2 captur
 
 ## Features
 
-- Interactive 3D comparison of cycle count, energy, cost, kinetics, and capacity
-- Electricity-price and material-cost controls
+- Interactive 3D comparison with user-defined equations and titles for all three axes
+- Formula-driven marker size and marker color
+- Three distinct marker color palettes, including a reversed green–yellow–red scale
+- Collapsible extra settings for plot ranges, marker scales, logarithmic axes, and color palettes
+- Transparent SVG plot export
+- Reusable user-defined numeric variables, with electricity price (`EP`) provided by default
+- Formula-driven material and energy cost
+- Always-visible table of source symbols, supported operators, and functions
+- Linear or logarithmic scaling for each calculated axis; X is logarithmic by default
 - Full-text search across every field in the source data
 - Filters for sorbent category and capture method
 - Sortable, paginated results table
