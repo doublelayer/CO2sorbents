@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CO₂ sorbents 3D plot</title>
-<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.35.2/plotly.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <style>
   :root {
     color-scheme: dark;
@@ -550,10 +548,6 @@
     font-weight: 600;
   }
 
-  #detail-fields dd a {
-    color: #8fcaef;
-  }
-
   @media (max-width: 1200px) {
     #layout {
       grid-template-columns: minmax(0, 1fr) 350px;
@@ -622,106 +616,116 @@
 
 <main>
   <div id="layout">
-    <div id="plot" aria-label="Interactive 3D plot of filtered sorbents"></div>
+    <section id="plot" aria-label="Interactive 3D plot of filtered sorbents"></section>
     <section id="sidepanel" aria-labelledby="plot-mappings-title">
       <h2 id="plot-mappings-title" class="panel-heading">Plot mappings</h2>
       <div class="mapping-grid">
-          <div class="mapping-control">
-            <label for="x-expression">X equation</label>
-            <div>
-              <input type="text" id="x-expression" spellcheck="false" autocomplete="off">
-              <p id="x-expression-error" class="formula-error" aria-live="polite"></p>
-            </div>
+        <div class="mapping-control">
+          <label for="x-expression">X equation</label>
+          <div>
+            <input type="text" id="x-expression" spellcheck="false" autocomplete="off">
+            <p id="x-expression-error" class="formula-error" aria-live="polite"></p>
           </div>
-          <div class="mapping-control">
-            <label for="x-title">X axis title</label>
-            <input type="text" id="x-title">
+        </div>
+        <div class="mapping-control">
+          <label for="x-title">X axis title</label>
+          <input type="text" id="x-title">
+        </div>
+        <div class="mapping-control">
+          <label for="y-expression">Y equation</label>
+          <div>
+            <input type="text" id="y-expression" spellcheck="false" autocomplete="off">
+            <p id="y-expression-error" class="formula-error" aria-live="polite"></p>
           </div>
-          <div class="mapping-control">
-            <label for="y-expression">Y equation</label>
-            <div>
-              <input type="text" id="y-expression" spellcheck="false" autocomplete="off">
-              <p id="y-expression-error" class="formula-error" aria-live="polite"></p>
-            </div>
+        </div>
+        <div class="mapping-control">
+          <label for="y-title">Y axis title</label>
+          <input type="text" id="y-title">
+        </div>
+        <div class="mapping-control">
+          <label for="z-expression">Z equation</label>
+          <div>
+            <input type="text" id="z-expression" spellcheck="false" autocomplete="off">
+            <p id="z-expression-error" class="formula-error" aria-live="polite"></p>
           </div>
-          <div class="mapping-control">
-            <label for="y-title">Y axis title</label>
-            <input type="text" id="y-title">
+        </div>
+        <div class="mapping-control">
+          <label for="z-title">Z axis title</label>
+          <input type="text" id="z-title">
+        </div>
+        <div class="mapping-control">
+          <label for="size-expression">Size equation</label>
+          <div>
+            <input type="text" id="size-expression" spellcheck="false" autocomplete="off">
+            <p id="size-expression-error" class="formula-error" aria-live="polite"></p>
           </div>
-          <div class="mapping-control">
-            <label for="z-expression">Z equation</label>
-            <div>
-              <input type="text" id="z-expression" spellcheck="false" autocomplete="off">
-              <p id="z-expression-error" class="formula-error" aria-live="polite"></p>
-            </div>
+        </div>
+        <div class="mapping-control">
+          <label for="size-title">Size title</label>
+          <input type="text" id="size-title">
+        </div>
+        <div class="mapping-control">
+          <label for="color-expression">Color equation</label>
+          <div>
+            <input type="text" id="color-expression" spellcheck="false" autocomplete="off">
+            <p id="color-expression-error" class="formula-error" aria-live="polite"></p>
           </div>
-          <div class="mapping-control">
-            <label for="z-title">Z axis title</label>
-            <input type="text" id="z-title">
-          </div>
-          <div class="mapping-control">
-            <label for="size-expression">Size equation</label>
-            <div>
-              <input type="text" id="size-expression" spellcheck="false" autocomplete="off">
-              <p id="size-expression-error" class="formula-error" aria-live="polite"></p>
-            </div>
-          </div>
-          <div class="mapping-control">
-            <label for="size-title">Size title</label>
-            <input type="text" id="size-title">
-          </div>
-          <div class="mapping-control">
-            <label for="color-expression">Color equation</label>
-            <div>
-              <input type="text" id="color-expression" spellcheck="false" autocomplete="off">
-              <p id="color-expression-error" class="formula-error" aria-live="polite"></p>
-            </div>
-          </div>
-          <div class="mapping-control">
-            <label for="color-title">Color title</label>
-            <input type="text" id="color-title">
-          </div>
+        </div>
+        <div class="mapping-control">
+          <label for="color-title">Color title</label>
+          <input type="text" id="color-title">
+        </div>
       </div>
       <details id="extra-settings">
         <summary>Extra settings</summary>
         <div class="extra-settings-body">
-            <p class="variable-hint">Leave minimum or maximum blank to determine it automatically.</p>
-            <div class="range-grid">
-              <span></span>
-              <span class="range-heading">Minimum</span>
-              <span class="range-heading">Maximum</span>
-              <span class="range-heading">Log</span>
+          <p class="variable-hint">Leave minimum or maximum blank to determine it automatically.</p>
+          <div class="range-grid">
+            <span></span>
+            <span class="range-heading">Minimum</span>
+            <span class="range-heading">Maximum</span>
+            <span class="range-heading">Log</span>
 
-              <label for="x-min">X</label>
-              <input type="number" id="x-min" step="any" placeholder="Auto" aria-label="X minimum">
-              <input type="number" id="x-max" step="any" placeholder="Auto" aria-label="X maximum">
-              <label class="log-toggle" title="Use a logarithmic X axis"><input type="checkbox" id="x-log" aria-label="Logarithmic X axis"></label>
+            <label for="x-min">X</label>
+            <input type="number" id="x-min" step="any" placeholder="Auto" aria-label="X minimum">
+            <input type="number" id="x-max" step="any" placeholder="Auto" aria-label="X maximum">
+            <label class="log-toggle" title="Use a logarithmic X axis">
+              <input type="checkbox" id="x-log" aria-label="Logarithmic X axis">
+            </label>
 
-              <label for="y-min">Y</label>
-              <input type="number" id="y-min" step="any" placeholder="Auto" aria-label="Y minimum">
-              <input type="number" id="y-max" step="any" placeholder="Auto" aria-label="Y maximum">
-              <label class="log-toggle" title="Use a logarithmic Y axis"><input type="checkbox" id="y-log" aria-label="Logarithmic Y axis"></label>
+            <label for="y-min">Y</label>
+            <input type="number" id="y-min" step="any" placeholder="Auto" aria-label="Y minimum">
+            <input type="number" id="y-max" step="any" placeholder="Auto" aria-label="Y maximum">
+            <label class="log-toggle" title="Use a logarithmic Y axis">
+              <input type="checkbox" id="y-log" aria-label="Logarithmic Y axis">
+            </label>
 
-              <label for="z-min">Z</label>
-              <input type="number" id="z-min" step="any" placeholder="Auto" aria-label="Z minimum">
-              <input type="number" id="z-max" step="any" placeholder="Auto" aria-label="Z maximum">
-              <label class="log-toggle" title="Use a logarithmic Z axis"><input type="checkbox" id="z-log" aria-label="Logarithmic Z axis"></label>
+            <label for="z-min">Z</label>
+            <input type="number" id="z-min" step="any" placeholder="Auto" aria-label="Z minimum">
+            <input type="number" id="z-max" step="any" placeholder="Auto" aria-label="Z maximum">
+            <label class="log-toggle" title="Use a logarithmic Z axis">
+              <input type="checkbox" id="z-log" aria-label="Logarithmic Z axis">
+            </label>
 
-              <label for="size-min">Size</label>
-              <input type="number" id="size-min" step="any" placeholder="Auto" aria-label="Size minimum">
-              <input type="number" id="size-max" step="any" placeholder="Auto" aria-label="Size maximum">
-              <span></span>
+            <label for="size-min">Size</label>
+            <input type="number" id="size-min" step="any" placeholder="Auto" aria-label="Size minimum">
+            <input type="number" id="size-max" step="any" placeholder="Auto" aria-label="Size maximum">
+            <label class="log-toggle" title="Use a logarithmic marker-size scale">
+              <input type="checkbox" id="size-log" aria-label="Logarithmic marker-size scale">
+            </label>
 
-              <label for="color-min">Color</label>
-              <input type="number" id="color-min" step="any" placeholder="Auto" aria-label="Color minimum">
-              <input type="number" id="color-max" step="any" placeholder="Auto" aria-label="Color maximum">
-              <span></span>
-            </div>
-            <p id="range-settings-error" class="formula-error" aria-live="polite"></p>
-            <div class="mapping-control extra-palette">
-              <label for="color-scale">Color palette</label>
-              <select id="color-scale"></select>
-            </div>
+            <label for="color-min">Color</label>
+            <input type="number" id="color-min" step="any" placeholder="Auto" aria-label="Color minimum">
+            <input type="number" id="color-max" step="any" placeholder="Auto" aria-label="Color maximum">
+            <label class="log-toggle" title="Use a logarithmic marker-color scale">
+              <input type="checkbox" id="color-log" aria-label="Logarithmic marker-color scale">
+            </label>
+          </div>
+          <p id="range-settings-error" class="formula-error" aria-live="polite"></p>
+          <div class="mapping-control extra-palette">
+            <label for="color-scale">Color palette</label>
+            <select id="color-scale"></select>
+          </div>
         </div>
       </details>
       <button type="button" id="export-plot" disabled>Export transparent SVG</button>
@@ -732,7 +736,10 @@
       <h2 id="formula-reference-title" class="panel-heading">Symbols and operations</h2>
       <div class="user-variables">
         <p class="mapping-subheading">User variables</p>
-        <p class="variable-hint"><code>EP</code> is electricity price in €/kWh.</p>
+        <p class="variable-hint">
+          <code>ep</code> is electricity price in €/kWh, <code>mS</code> is sorbent mass in kg,
+          and <code>mCO2</code> is CO₂ mass in g.
+        </p>
         <div id="user-variable-list"></div>
         <p id="user-variables-error" class="formula-error" aria-live="polite"></p>
         <button type="button" id="add-variable">Add variable</button>
@@ -747,14 +754,21 @@
         <p>User-variable names are available in every equation.</p>
         <p><strong>Scientific notation:</strong> <code>1E6</code> means 1,000,000.</p>
         <p><strong>Operators:</strong> <code>+ − * / ^</code> and parentheses.</p>
-        <p><strong>Functions:</strong> <code>min</code>, <code>max</code>, <code>abs</code>, <code>sqrt</code>, <code>log</code>, <code>log10</code>, <code>exp</code>, <code>pow</code>, and <code>if</code>.</p>
+        <p>
+          <strong>Functions:</strong> <code>min</code>, <code>max</code>, <code>abs</code>,
+          <code>sqrt</code>, <code>log</code>, <code>log10</code>, <code>exp</code>,
+          <code>pow</code>, and <code>if</code>.
+        </p>
       </div>
     </aside>
   </div>
 
   <section id="explorer" aria-labelledby="explorer-title">
     <h2 id="explorer-title" class="section-heading">Explore the complete dataset</h2>
-    <p class="section-description">Search and filter every named sorbent, including records without enough data for the 3D model. Select “View” to inspect all source fields.</p>
+    <p class="section-description">
+      Search and filter every named sorbent, including records without enough data for the 3D
+      model. Select “View” to inspect all source fields.
+    </p>
 
     <div id="filters">
       <div class="filter-control">
@@ -812,6 +826,8 @@
   <dl id="detail-fields"></dl>
 </dialog>
 
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.35.2/plotly.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSrocYVch0p6yXg-tc6RrSRPpx1v1POsZT9gfKeCPJ5wKCNRD40LxtIlI3llEtRY1WdJpSSs5T7D1kG/pub?gid=159971136&single=true&output=csv";
 
@@ -827,19 +843,20 @@ const CAMERA = {
   eye: { x: 1.6, y: -1.6, z: 0.4 },
 };
 
-const AXIS_NAMES = ["x", "y", "z"];
-const MAPPING_NAMES = [...AXIS_NAMES, "size", "color"];
+const T90_FACTOR = 2.3026;
+const MAPPING_NAMES = ["x", "y", "z", "size", "color"];
 
 const TABLE_COLUMNS = [
-  { key: "Sorbent name", label: "Sorbent name", className: "name-cell" },
-  { key: "Sorbent category", label: "Category" },
-  { key: "Capture method", label: "Capture method", className: "method-cell" },
-  { key: "Capture temperature", label: "Temperature (°C)", numeric: true },
-  { key: "Reaction Enthalpy", label: "Enthalpy (kJ/mol)", numeric: true },
-  { key: "Maximum Capacity", label: "Capacity (mol/kg)", numeric: true },
-  { key: "Reaction Kinetics", label: "Kinetics (min)", numeric: true },
-  { key: "Sorbent Cost", label: "Cost ($/kg)", numeric: true },
-  { key: "Year of publication", label: "Year" },
+  { key: "sorbent name", label: "Sorbent name", className: "name-cell" },
+  { key: "sorbent category", label: "Category" },
+  { key: "sorbent class", label: "Class" },
+  { key: "capture method", label: "Capture method", className: "method-cell" },
+  { key: "capture temperature", label: "Temperature (°C)", numeric: true },
+  { key: "reaction enthalpy", label: "Enthalpy (kJ/mol)", numeric: true },
+  { key: "maximum capacity", label: "Capacity (mol/kg)", numeric: true },
+  { key: "reaction kinetics", label: "Kinetics (min)", numeric: true },
+  { key: "sorbent cost", label: "Cost ($/kg)", numeric: true },
+  { key: "year of publication", label: "Year" },
 ];
 
 const TABLE_COLUMNS_BY_KEY = new Map(TABLE_COLUMNS.map(column => [column.key, column]));
@@ -848,45 +865,57 @@ const SORT_COLLATOR = new Intl.Collator(undefined, { numeric: true, sensitivity:
 const PAGE_SIZE = 15;
 
 const FIELD_UNITS = {
-  "Capture temperature": "°C",
-  "Total pressure": "bar",
-  "CO2 concentration": "%",
-  "Reaction Enthalpy": "kJ/mol",
-  "Maximum Capacity": "mol/kg",
-  "Reaction Kinetics": "min",
-  "Reaction Kinetics 2": "s⁻¹",
-  "Cyclic Stability": "%",
-  "Capacity at max cycle": "%",
-  "Viscosity": "mPa·s",
-  "Corrosivity": "µm/yr",
-  "Volatility": "kPa",
-  "Sorbent Cost": "$/kg",
+  "capture temperature": "°C",
+  "total pressure": "bar",
+  "co2 concentration": "%",
+  "reaction enthalpy": "kJ/mol",
+  "maximum capacity": "mol/kg",
+  "reaction kinetics": "min",
+  "reaction kinetics 2": "s⁻¹",
+  "cyclic stability": "%",
+  "capacity at max cycle": "%",
+  "viscosity": "mPa·s",
+  "corrosivity": "µm/yr",
+  "volatility": "kPa",
+  "sorbent cost": "$/kg",
 };
 
 const DEFAULT_MAPPINGS = {
   x: {
-    expression: "1E5 / (44 * C)",
-    title: "Cycles per 10 kg sorbent per ton CO₂",
-    axisType: "log",
+    expression: "mCO2 / (44 * C * mS)",
+    title: "Cycles required for the specified sorbent and CO₂ masses",
+    scale: "log",
     min: 100,
     max: 10000,
   },
   y: {
     expression: "H / 44",
     title: "Energy (GJ per ton CO₂)",
-    axisType: "linear",
+    scale: "linear",
     min: 0,
     max: 6,
   },
   z: {
-    expression: "10^6 * H * EP / (3600 * 44) + 44 * C * M / 10^5",
-    title: "Cost (€ per ton CO₂)",
-    axisType: "linear",
+    expression: "mCO2 * H * ep / (3600 * 44) + 44 * C * cS * mS / mCO2",
+    title: "Cost (€ for the specified CO₂ mass)",
+    scale: "linear",
     min: 0,
     max: 300,
   },
-  size: { expression: "C", title: "Maximum capacity (mol/kg)", min: 0.2, max: 17.8 },
-  color: { expression: "t", title: "Reaction kinetics (min)", min: 2, max: 100 },
+  size: {
+    expression: "C",
+    title: "Maximum capacity (mol/kg)",
+    scale: "linear",
+    min: 0.2,
+    max: 17.8,
+  },
+  color: {
+    expression: "k",
+    title: "Reaction kinetics (min)",
+    scale: "log",
+    min: 2,
+    max: 100,
+  },
 };
 
 const COLOR_SCALES = [
@@ -914,7 +943,9 @@ const COLOR_SCALES = [
 const DEFAULT_COLOR_SCALE = "RdYlGn_r";
 
 const DEFAULT_USER_VARIABLES = [
-  { name: "EP", value: "0.20" },
+  { name: "ep", value: "0.20" },
+  { name: "mS", value: "10" },
+  { name: "mCO2", value: "1E6" },
 ];
 
 const UI = {
@@ -950,25 +981,32 @@ const MAPPING_CONTROLS = Object.fromEntries(MAPPING_NAMES.map(name => [name, {
   title: document.getElementById(`${name}-title`),
   min: document.getElementById(`${name}-min`),
   max: document.getElementById(`${name}-max`),
-  log: AXIS_NAMES.includes(name) ? document.getElementById(`${name}-log`) : null,
+  log: document.getElementById(`${name}-log`),
 }]));
 
 const FORMULA_VARIABLES = [
-  { symbol: "T", field: "Capture temperature", label: "capture temperature", unit: "°C" },
-  { symbol: "P", field: "Total pressure", label: "total pressure", unit: "bar" },
-  { symbol: "CO2", field: "CO2 concentration", label: "CO₂ concentration", unit: "%" },
-  { symbol: "H", field: "Reaction Enthalpy", label: "reaction enthalpy", unit: "kJ/mol" },
-  { symbol: "C", field: "Maximum Capacity", label: "maximum capacity", unit: "mol/kg" },
-  { symbol: "t", field: "Reaction Kinetics", label: "reaction kinetics", unit: "min", parse: parseKinetics },
-  { symbol: "k", field: "Reaction Kinetics 2", label: "reaction kinetics 2", unit: "s⁻¹" },
-  { symbol: "S", field: "Cyclic Stability", label: "cyclic stability", unit: "%" },
-  { symbol: "N", field: "Maximum Cycles", label: "maximum cycles" },
-  { symbol: "Q", field: "Capacity at max cycle", label: "capacity at max cycle", unit: "%" },
-  { symbol: "V", field: "Viscosity", label: "viscosity", unit: "mPa·s" },
-  { symbol: "R", field: "Corrosivity", label: "corrosivity", unit: "µm/yr" },
-  { symbol: "VP", field: "Volatility", label: "volatility", unit: "kPa" },
-  { symbol: "M", field: "Sorbent Cost", label: "sorbent cost", unit: "$/kg", parse: parseSorbentCost },
-  { symbol: "SN2", field: "Selectivity (N2)", label: "selectivity (N₂)" },
+  { symbol: "t", field: "capture temperature", label: "capture temperature", unit: "°C" },
+  { symbol: "p", field: "total pressure", label: "total pressure", unit: "bar" },
+  { symbol: "CO2", field: "co2 concentration", label: "CO₂ concentration", unit: "%" },
+  { symbol: "H", field: "reaction enthalpy", label: "reaction enthalpy", unit: "kJ/mol" },
+  { symbol: "C", field: "maximum capacity", label: "maximum capacity", unit: "mol/kg" },
+  {
+    symbol: "k",
+    label: "reaction kinetics",
+    unit: "min",
+    getValue: source => parseReactionKinetics(
+      source["reaction kinetics"],
+      source["reaction kinetics 2"]
+    ),
+  },
+  { symbol: "s", field: "cyclic stability", label: "cyclic stability", unit: "%" },
+  { symbol: "n", field: "maximum cycles", label: "maximum cycles" },
+  { symbol: "q", field: "capacity at max cycle", label: "capacity at max cycle", unit: "%" },
+  { symbol: "v", field: "viscosity", label: "viscosity", unit: "mPa·s" },
+  { symbol: "r", field: "corrosivity", label: "corrosivity", unit: "µm/yr" },
+  { symbol: "vp", field: "volatility", label: "volatility", unit: "kPa" },
+  { symbol: "cS", field: "sorbent cost", label: "sorbent cost", unit: "$/kg", parse: parseSorbentCost },
+  { symbol: "sN2", field: "selectivity (n2)", label: "selectivity (N₂)" },
 ];
 
 const FORMULA_SYMBOLS = new Set(FORMULA_VARIABLES.map(variable => variable.symbol));
@@ -986,25 +1024,40 @@ function parseSorbentCost(value) {
   return parseNum(value, ["$", "/kg"]);
 }
 
-function parseKinetics(value) {
+function rateConstantToMinutes(value) {
+  const text = String(value ?? "")
+    .trim()
+    .replace(/^(?:k1a|kapp)\s*[:=]?\s*/i, "");
+  const match = text.match(/^[0-9]*[.]?[0-9]+/);
+  if (!match) return null;
+
+  const rateConstant = Number(match[0]);
+  return rateConstant > 0 ? T90_FACTOR / rateConstant / 60 : null;
+}
+
+function parseReactionKineticsValue(value) {
   if (value === null || value === undefined) return null;
 
   const text = String(value).trim().toLowerCase();
   if (!text) return null;
-  const directNumber = Number(text);
-  if (Number.isFinite(directNumber)) return directNumber;
+
+  if (/^[0-9]*[.]?[0-9]+$/.test(text)) return Number(text);
+
+  const timeMatch = text.match(/([0-9]*[.]?[0-9]+)\s*(s|min)\b/);
+  if (timeMatch && !text.startsWith("k1a") && !text.startsWith("kapp")) {
+    const time = Number(timeMatch[1]);
+    return timeMatch[2] === "s" ? time / 60 : time;
+  }
 
   if (text.startsWith("k1a") || text.startsWith("kapp")) {
-    const match = text.match(/([0-9]+(?:[.][0-9]+)?)[ ]*(k)?/);
-    if (!match) return null;
-
-    let rateConstant = Number(match[1]);
-    if (match[2]) rateConstant *= 1000;
-
-    return rateConstant > 0 ? (2.3026 / rateConstant) / 60 : null;
+    return rateConstantToMinutes(text);
   }
 
   return null;
+}
+
+function parseReactionKinetics(timeValue, rateValue) {
+  return parseReactionKineticsValue(timeValue) ?? rateConstantToMinutes(rateValue);
 }
 
 const FORMULA_FUNCTIONS = {
@@ -1223,6 +1276,7 @@ function compileFormula(expression, additionalSymbols = []) {
 function parseCSV(text) {
   const result = Papa.parse(text, {
     header: true,
+    transformHeader: header => header.trim().toLowerCase(),
     dynamicTyping: false,
     skipEmptyLines: true,
   });
@@ -1238,15 +1292,16 @@ function createRecord(source) {
   const formulaValues = Object.create(null);
 
   for (const variable of FORMULA_VARIABLES) {
-    const value = variable.parse
-      ? variable.parse(source[variable.field])
-      : parseNum(source[variable.field]);
+    let value;
+    if (variable.getValue) value = variable.getValue(source);
+    else if (variable.parse) value = variable.parse(source[variable.field]);
+    else value = parseNum(source[variable.field]);
     formulaValues[variable.symbol] = value ?? NaN;
   }
 
   return {
     source,
-    name: source["Sorbent name"]?.trim() ?? "",
+    name: source["sorbent name"]?.trim() ?? "",
     searchText: Object.values(source).join(" ").toLowerCase(),
     formulaValues,
   };
@@ -1306,7 +1361,7 @@ function getUserVariables() {
   return variables;
 }
 
-function getMappingRange(mappingName, axisType) {
+function getMappingRange(mappingName, scale) {
   const { min: minInput, max: maxInput } = MAPPING_CONTROLS[mappingName];
   const minRaw = minInput.value.trim();
   const maxRaw = maxInput.value.trim();
@@ -1318,7 +1373,7 @@ function getMappingRange(mappingName, axisType) {
 
   if (minInvalid || maxInvalid) {
     error = `${mappingName.toUpperCase()} limits must be finite numbers.`;
-  } else if (axisType === "log" && ((min !== null && min <= 0) || (max !== null && max <= 0))) {
+  } else if (scale === "log" && ((min !== null && min <= 0) || (max !== null && max <= 0))) {
     minInvalid = min !== null && min <= 0;
     maxInvalid = max !== null && max <= 0;
     error = `${mappingName.toUpperCase()} logarithmic limits must be greater than zero.`;
@@ -1343,8 +1398,8 @@ function getPlotMappings() {
   for (const mappingName of MAPPING_NAMES) {
     const controls = MAPPING_CONTROLS[mappingName];
     const expression = controls.expression.value.trim();
-    const axisType = controls.log ? (controls.log.checked ? "log" : "linear") : null;
-    const range = getMappingRange(mappingName, axisType);
+    const scale = controls.log.checked ? "log" : "linear";
+    const range = getMappingRange(mappingName, scale);
     if (range.error && !rangeError) rangeError = range.error;
     if (range.error && !firstError) firstError = new Error(range.error);
 
@@ -1355,8 +1410,8 @@ function getPlotMappings() {
         title: controls.title.value.trim(),
         min: range.min,
         max: range.max,
+        scale,
       };
-      if (axisType) mappings[mappingName].axisType = axisType;
       setFormulaError(mappingName);
     } catch (error) {
       setFormulaError(mappingName, error.message);
@@ -1367,7 +1422,7 @@ function getPlotMappings() {
   UI.rangeError.textContent = rangeError;
   if (firstError) throw firstError;
   mappings.color.colorScale = COLOR_SCALES.find(
-    scale => scale.value === UI.colorScale.value
+    palette => palette.value === UI.colorScale.value
   ) ?? COLOR_SCALES[0];
   mappings.userVariables = userVariables;
   return mappings;
@@ -1378,25 +1433,19 @@ function createPlotPoints(rows, mappings) {
 
   for (const row of rows) {
     const context = { ...row.formulaValues, ...mappings.userVariables };
+    const values = {};
+    let valid = true;
 
-    const x = mappings.x.evaluate(context);
-    const y = mappings.y.evaluate(context);
-    const z = mappings.z.evaluate(context);
-    const sizeValue = mappings.size.evaluate(context);
-    const colorValue = mappings.color.evaluate(context);
-    if (![x, y, z, sizeValue, colorValue].every(Number.isFinite)) continue;
-    if (mappings.x.axisType === "log" && x <= 0) continue;
-    if (mappings.y.axisType === "log" && y <= 0) continue;
-    if (mappings.z.axisType === "log" && z <= 0) continue;
+    for (const name of MAPPING_NAMES) {
+      const value = mappings[name].evaluate(context);
+      if (!Number.isFinite(value) || (mappings[name].scale === "log" && value <= 0)) {
+        valid = false;
+        break;
+      }
+      values[name] = value;
+    }
 
-    points.push({
-      name: row.name,
-      x,
-      y,
-      z,
-      sizeValue,
-      colorValue,
-    });
+    if (valid) points.push({ name: row.name, ...values });
   }
 
   return points;
@@ -1423,6 +1472,9 @@ function resolveScaleRange(values, minimum, maximum, positive = false) {
       max = positive ? min * 10 : min + Math.max(Math.abs(min) * 0.1, 1);
     } else if (minimum === null && maximum !== null) {
       min = positive ? max / 10 : max - Math.max(Math.abs(max) * 0.1, 1);
+    } else if (positive) {
+      min /= 10;
+      max *= 10;
     } else {
       const padding = Math.max(Math.abs(min) * 0.05, 0.5);
       min -= padding;
@@ -1436,34 +1488,70 @@ function resolveScaleRange(values, minimum, maximum, positive = false) {
 function scaleMarkerSizes(values, mapping) {
   if (values.length === 0) return [];
 
-  const { min, max } = resolveScaleRange(values, mapping.min, mapping.max);
+  const logarithmic = mapping.scale === "log";
+  const { min, max } = resolveScaleRange(values, mapping.min, mapping.max, logarithmic);
+  const scaledMin = logarithmic ? Math.log10(min) : min;
+  const scaledMax = logarithmic ? Math.log10(max) : max;
 
   return values.map(value => {
-    const normalized = Math.min(Math.max((value - min) / (max - min), 0), 1);
+    const scaledValue = logarithmic ? Math.log10(value) : value;
+    const normalized = Math.min(Math.max(
+      (scaledValue - scaledMin) / (scaledMax - scaledMin),
+      0
+    ), 1);
     return MARKER.minSize + Math.sqrt(normalized) * (MARKER.maxSize - MARKER.minSize);
   });
 }
 
-function makeAxisConfig(mapping, axisName, values) {
+function makeLogColorbarTicks(min, max) {
+  const startExponent = Math.floor(Math.log10(min));
+  const endExponent = Math.ceil(Math.log10(max));
+  const factors = endExponent - startExponent > 3 ? [1] : [1, 2, 5];
+  const values = [];
+
+  for (let exponent = startExponent; exponent <= endExponent; exponent += 1) {
+    for (const factor of factors) {
+      const value = factor * (10 ** exponent);
+      if (value >= min && value <= max) values.push(value);
+    }
+  }
+
+  if (values.length === 0 || values[0] > min) values.unshift(min);
+  if (values[values.length - 1] < max) values.push(max);
+
+  return {
+    tickmode: "array",
+    tickvals: values.map(value => Math.log10(value)),
+    ticktext: values.map(value => {
+      if (value >= 10000 || value < 0.01) {
+        return value.toExponential(1).replace("e+", "e");
+      }
+      return String(Number(value.toPrecision(3)));
+    }),
+  };
+}
+
+function makeAxisConfig(mapping, values) {
   const config = {
     title: { text: mapping.title || mapping.expression, font: { size: 14 } },
-    type: mapping.axisType,
+    type: mapping.scale,
     showbackground: false,
     backgroundcolor: TRANSPARENT,
     gridcolor: "#444",
     zerolinecolor: "#555",
     tickfont: { color: "#ccc", size: 12 },
-    titlefont: { color: "#ccc", size: 14 },
   };
 
   if (mapping.min !== null || mapping.max !== null) {
-    const range = resolveScaleRange(values, mapping.min, mapping.max, mapping.axisType === "log");
-    config.range = mapping.axisType === "log"
+    const range = resolveScaleRange(
+      values,
+      mapping.min,
+      mapping.max,
+      mapping.scale === "log"
+    );
+    config.range = mapping.scale === "log"
       ? [Math.log10(range.min), Math.log10(range.max)]
       : [range.min, range.max];
-  }
-  if (axisName === "y" && mapping.expression === DEFAULT_MAPPINGS.y.expression && mapping.axisType === "linear") {
-    config.dtick = 2;
   }
   return config;
 }
@@ -1482,13 +1570,25 @@ function makeFigure(points, mappings) {
     xs.push(point.x);
     ys.push(point.y);
     zs.push(point.z);
-    sizeValues.push(point.sizeValue);
-    colors.push(point.colorValue);
-    customdata.push([point.sizeValue, point.colorValue]);
+    sizeValues.push(point.size);
+    colors.push(point.color);
+    customdata.push([point.size, point.color]);
   }
 
   const sizes = scaleMarkerSizes(sizeValues, mappings.size);
-  const colorRange = resolveScaleRange(colors, mappings.color.min, mappings.color.max);
+  const logarithmicColor = mappings.color.scale === "log";
+  const colorRange = resolveScaleRange(
+    colors,
+    mappings.color.min,
+    mappings.color.max,
+    logarithmicColor
+  );
+  const plottedColors = logarithmicColor
+    ? colors.map(value => Math.log10(value))
+    : colors;
+  const plottedColorRange = logarithmicColor
+    ? { min: Math.log10(colorRange.min), max: Math.log10(colorRange.max) }
+    : colorRange;
   const hoverLabels = Object.fromEntries(MAPPING_NAMES.map(mappingName => [
     mappingName,
     (mappings[mappingName].title || mappings[mappingName].expression)
@@ -1497,14 +1597,20 @@ function makeFigure(points, mappings) {
       .replaceAll(">", "&gt;"),
   ]));
   const colorbar = {
-    title: { text: mappings.color.title || mappings.color.expression, side: "right" },
+    title: {
+      text: mappings.color.title || mappings.color.expression,
+      side: "right",
+      font: { color: "#ddd", size: 14 },
+    },
     x: 0.92,
     y: 0.5,
     len: 0.5,
     thickness: 20,
     tickfont: { color: "#ddd", size: 13 },
-    titlefont: { color: "#ddd", size: 14 },
   };
+  if (logarithmicColor) {
+    Object.assign(colorbar, makeLogColorbarTicks(colorRange.min, colorRange.max));
+  }
 
   const trace = {
     type: "scatter3d",
@@ -1514,13 +1620,20 @@ function makeFigure(points, mappings) {
     z: zs,
     text: names,
     customdata,
-    hovertemplate: `<b>%{text}</b><br>${hoverLabels.x}: %{x:.3g}<br>${hoverLabels.y}: %{y:.3g}<br>${hoverLabels.z}: %{z:.3g}<br>${hoverLabels.size}: %{customdata[0]:.3g}<br>${hoverLabels.color}: %{customdata[1]:.3g}<extra></extra>`,
+    hovertemplate: [
+      "<b>%{text}</b>",
+      `${hoverLabels.x}: %{x:.3g}`,
+      `${hoverLabels.y}: %{y:.3g}`,
+      `${hoverLabels.z}: %{z:.3g}`,
+      `${hoverLabels.size}: %{customdata[0]:.3g}`,
+      `${hoverLabels.color}: %{customdata[1]:.3g}<extra></extra>`,
+    ].join("<br>"),
     marker: {
       size: sizes,
-      color: colors,
+      color: plottedColors,
       colorscale: mappings.color.colorScale.colors,
-      cmin: colorRange.min,
-      cmax: colorRange.max,
+      cmin: plottedColorRange.min,
+      cmax: plottedColorRange.max,
       colorbar,
       opacity: MARKER.opacity,
       line: { width: 0.5, color: "#fff" },
@@ -1539,11 +1652,11 @@ function makeFigure(points, mappings) {
       bgcolor: TRANSPARENT,
       aspectmode: "cube",
       domain: { x: [0, 0.88], y: [0, 1] },
-      xaxis: makeAxisConfig(mappings.x, "x", xs),
-      yaxis: makeAxisConfig(mappings.y, "y", ys),
-      zaxis: makeAxisConfig(mappings.z, "z", zs),
+      camera: CAMERA,
+      xaxis: makeAxisConfig(mappings.x, xs),
+      yaxis: makeAxisConfig(mappings.y, ys),
+      zaxis: makeAxisConfig(mappings.z, zs),
     },
-    scene_camera: CAMERA,
   };
 
   if (points.length === 0) {
@@ -1567,7 +1680,7 @@ const state = {
   sortedRecords: [],
   currentPage: 1,
   pageSize: PAGE_SIZE,
-  sort: { key: "Sorbent name", direction: 1 },
+  sort: { key: "sorbent name", direction: 1 },
 };
 
 function addUserVariable(name = "", value = "") {
@@ -1624,7 +1737,7 @@ function initializePlotControls() {
     controls.title.value = defaults.title;
     controls.min.value = defaults.min;
     controls.max.value = defaults.max;
-    if (controls.log) controls.log.checked = defaults.axisType === "log";
+    controls.log.checked = defaults.scale === "log";
   }
 
   const colorScaleOptions = document.createDocumentFragment();
@@ -1667,8 +1780,8 @@ function populateSelect(select, values) {
 }
 
 function initializeFilters() {
-  populateSelect(UI.categoryFilter, state.records.map(record => record.source["Sorbent category"] ?? ""));
-  populateSelect(UI.methodFilter, state.records.map(record => record.source["Capture method"] ?? ""));
+  populateSelect(UI.categoryFilter, state.records.map(record => record.source["sorbent category"] ?? ""));
+  populateSelect(UI.methodFilter, state.records.map(record => record.source["capture method"] ?? ""));
 }
 
 function getFilteredRecords() {
@@ -1678,8 +1791,8 @@ function getFilteredRecords() {
 
   return state.records.filter(record => {
     const row = record.source;
-    if (category && row["Sorbent category"]?.trim() !== category) return false;
-    if (method && row["Capture method"]?.trim() !== method) return false;
+    if (category && row["sorbent category"]?.trim() !== category) return false;
+    if (method && row["capture method"]?.trim() !== method) return false;
     return !searchTerm || record.searchText.includes(searchTerm);
   });
 }
@@ -1718,10 +1831,13 @@ function renderTableHeader() {
     const button = document.createElement("button");
     const active = state.sort.key === column.key;
     const indicator = active ? (state.sort.direction === 1 ? " ▲" : " ▼") : "";
+    const directionLabel = active
+      ? (state.sort.direction === 1 ? ", ascending" : ", descending")
+      : "";
 
     button.type = "button";
     button.textContent = column.label + indicator;
-    button.setAttribute("aria-label", `Sort by ${column.label}${active ? (state.sort.direction === 1 ? ", ascending" : ", descending") : ""}`);
+    button.setAttribute("aria-label", `Sort by ${column.label}${directionLabel}`);
     button.addEventListener("click", () => {
       if (state.sort.key === column.key) {
         state.sort.direction *= -1;
@@ -1754,7 +1870,7 @@ function appendCell(rowElement, value, className = "") {
 }
 
 function openDetails(row) {
-  const name = row["Sorbent name"]?.trim() || "Sorbent details";
+  const name = row["sorbent name"]?.trim() || "Sorbent details";
   const fragment = document.createDocumentFragment();
 
   UI.detailTitle.textContent = name;
@@ -1802,7 +1918,7 @@ function renderTable() {
     detailsButton.type = "button";
     detailsButton.className = "details-button";
     detailsButton.textContent = "View";
-    detailsButton.setAttribute("aria-label", `View all fields for ${row["Sorbent name"] || "this sorbent"}`);
+    detailsButton.setAttribute("aria-label", `View all fields for ${row["sorbent name"] || "this sorbent"}`);
     detailsButton.addEventListener("click", () => openDetails(row));
     actionCell.appendChild(detailsButton);
     rowElement.appendChild(actionCell);
@@ -1844,28 +1960,27 @@ function renderPlot() {
   }
   if (state.records.length === 0) return;
 
+  const recordSummary =
+    `Showing ${state.filteredRecords.length} of ${state.records.length} records.`;
   let mappings;
   try {
     mappings = getPlotMappings();
   } catch (error) {
     UI.status.textContent = `Plot setting error: ${error.message}`;
-    UI.resultSummary.textContent =
-      `Showing ${state.filteredRecords.length} of ${state.records.length} records. Fix the highlighted plot setting to update the 3D plot.`;
+    UI.resultSummary.textContent = `${recordSummary} Fix the highlighted plot setting to update the 3D plot.`;
     return;
   }
 
   const points = createPlotPoints(state.filteredRecords, mappings);
 
   const { trace, layout } = makeFigure(points, mappings);
-  Plotly.react(UI.plot, [trace], layout, {
-    displayModeBar: true,
-  });
+  Plotly.react(UI.plot, [trace], layout);
   UI.exportPlot.disabled = false;
 
   UI.status.textContent =
     `${state.filteredRecords.length} matching records; ${points.length} have the values required for this plot.`;
   UI.resultSummary.textContent =
-    `Showing ${state.filteredRecords.length} of ${state.records.length} records. ${points.length} are represented in the 3D plot with the current settings.`;
+    `${recordSummary} ${points.length} are represented in the 3D plot with the current settings.`;
 }
 
 async function exportPlot() {
@@ -1920,7 +2035,7 @@ async function loadData() {
 
     const text = await response.text();
     state.records = parseCSV(text)
-      .filter(row => row["Sorbent name"]?.trim())
+      .filter(row => row["sorbent name"]?.trim())
       .map(createRecord);
 
     initializeFilters();
@@ -1974,7 +2089,7 @@ for (const mappingName of MAPPING_NAMES) {
   controls.title.addEventListener("input", schedulePlotRender);
   controls.min.addEventListener("input", schedulePlotRender);
   controls.max.addEventListener("input", schedulePlotRender);
-  controls.log?.addEventListener("change", schedulePlotRender);
+  controls.log.addEventListener("change", schedulePlotRender);
 }
 UI.colorScale.addEventListener("change", schedulePlotRender);
 UI.exportPlot.addEventListener("click", exportPlot);

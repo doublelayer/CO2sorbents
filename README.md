@@ -1,32 +1,47 @@
-# CO2 sorbents comparison tool
+# An Open Data Approach for Comparing CO2 Sorbents
 
-An interactive tool for comparing and exploring sorbents for emerging CO2 capture technologies. Data is loaded live from the project's published Google Sheet.
+This repository contains a multidimensional visualization tool for comparing CO₂ sorbent performance using parameters relevant to CO₂ capture processes. The interactive tool connects sorbent properties and operating conditions in a configurable three-dimensional plot, making it possible to explore performance trade-offs across the open dataset developed in this work.
 
-## Features
+## Authors
 
-- Interactive 3D comparison with user-defined equations and titles for all three axes
-- Formula-driven marker size and marker color
-- Three distinct marker color palettes, including a reversed green–yellow–red scale
-- Collapsible extra settings for plot ranges, marker scales, logarithmic axes, and color palettes
-- Transparent SVG plot export
-- Reusable user-defined numeric variables, with electricity price (`EP`) provided by default
-- Formula-driven material and energy cost
-- Always-visible table of source symbols, supported operators, and functions
-- Linear or logarithmic scaling for each calculated axis; X is logarithmic by default
-- Full-text search across every field in the source data
+Margarita Burunova, Iuliia Vetik, Anna Stepanova, Timmo-Hendrik Pukk, Karolina Kudelina-Zhang, Nadezda Kongi, and Vladislav Ivanistsev.
+
+## Publication and data
+
+- **Preprint:** [An Open Data Approach for Comparing CO2 Sorbents](https://chemrxiv.org/doi/full/10.26434/chemrxiv-2026-g3zqr/v2)
+- **Machine-readable dataset:** [Zenodo record](https://zenodo.org/records/20052533)
+- **Dataset DOI:** [10.5281/zenodo.20052533](https://www.doi.org/10.5281/zenodo.20052533)
+
+## Visualization tool
+
+The visualization tool is available online at:
+
+<https://doublelayer.github.io/CO2sorbents/>
+
+Its source code is available at:
+
+<https://github.com/doublelayer/CO2sorbents>
+
+The tool provides:
+
+- Interactive three-dimensional comparison of CO₂ sorbents
+- User-defined equations and titles for all three axes
+- Formula-driven marker size and color
+- Linear and logarithmic scaling for axes, marker size, and marker color
+- Configurable ranges, color palettes, and reusable numeric variables, including default values for electricity price (`ep`), sorbent mass (`mS`), and CO₂ mass (`mCO2`)
+- Full-text search across the source data
 - Filters for sorbent category and capture method
-- Sortable, paginated results table
-- Complete record details, including fields that are not used by the 3D model
-- Shared filters between the table and plot
+- A sortable, paginated table with complete record details
+- Transparent SVG plot export
 
-Records that are missing values required by the model remain available in the table. The status beside the plot reports how many filtered records can currently be plotted.
+Records without all values required by the selected visualization remain accessible in the data table.
 
 ## Run locally
 
-The page must be served over HTTP because browsers restrict Google Sheet requests made from `file://` pages.
+The page loads data from a published Google Sheet and must be served over HTTP because browsers restrict requests made from `file://` pages.
 
 ```bash
 python3 -m http.server 8000 --bind 127.0.0.1
 ```
 
-Then open <http://localhost:8000/>. Press `Ctrl+C` in the terminal to stop the server.
+Open <http://localhost:8000/> in a browser. Press `Ctrl+C` in the terminal to stop the server.
