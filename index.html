@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CO₂ sorbents 3D plot</title>
+<title>CO₂ sorbent performance visualization</title>
 <style>
   :root {
     color-scheme: dark;
@@ -21,6 +21,10 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+  }
+
+  [hidden] {
+    display: none !important;
   }
 
   body {
@@ -170,6 +174,18 @@
     font-weight: 600;
   }
 
+  .plot-mode-control {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+  }
+
+  .plot-mode-control label {
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+
   .mapping-grid {
     display: grid;
     gap: 9px;
@@ -275,14 +291,26 @@
     margin-top: 0.7rem;
   }
 
+  .export-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 7px;
+  }
+
   #export-plot {
-    width: 100%;
     color: var(--accent);
   }
 
   #export-plot:disabled {
     color: #777;
     cursor: not-allowed;
+  }
+
+  .export-hint {
+    grid-column: 1 / -1;
+    color: var(--muted);
+    font-size: 0.7rem;
+    line-height: 1.35;
   }
 
   .user-variables {
@@ -385,6 +413,31 @@
     font-size: 0.84rem;
   }
 
+  .explorer-heading-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .record-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .primary-action {
+    color: #111;
+    background: var(--accent);
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+
+  .primary-action:not(:disabled):hover {
+    background: #83da8b;
+  }
+
   .table-wrap {
     overflow-x: auto;
     border: 1px solid var(--border);
@@ -431,6 +484,31 @@
 
   #explorer tbody tr:hover {
     background: #242424;
+  }
+
+  #explorer tbody tr.local-record-row {
+    background: #18291b;
+  }
+
+  #explorer tbody tr.local-record-row:hover {
+    background: #203824;
+  }
+
+  .local-badge {
+    display: inline-block;
+    margin-left: 0.45rem;
+    padding: 0.1rem 0.32rem;
+    color: #b8efbd;
+    background: #24492a;
+    border-radius: 999px;
+    font-size: 0.66rem;
+    font-weight: 500;
+    vertical-align: 0.1em;
+  }
+
+  .table-actions {
+    display: flex;
+    gap: 6px;
   }
 
   #explorer tbody tr:last-child td {
@@ -543,6 +621,137 @@
     overflow-wrap: anywhere;
   }
 
+  #submission-dialog {
+    width: min(1040px, calc(100vw - 2rem));
+  }
+
+  #submission-form {
+    max-height: calc(100vh - 7rem);
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  .submission-intro {
+    margin-bottom: 1rem;
+    color: var(--muted);
+    font-size: 0.84rem;
+    line-height: 1.45;
+  }
+
+  .submission-basic-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .submission-field,
+  .submission-number {
+    display: grid;
+    gap: 5px;
+  }
+
+  .submission-field label,
+  .submission-number label,
+  .kinetics-representation label {
+    color: #ddd;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .submission-definition {
+    color: var(--muted);
+    font-size: 0.7rem;
+    line-height: 1.35;
+  }
+
+  .submission-fields {
+    display: grid;
+    gap: 10px;
+  }
+
+  .submission-number {
+    grid-template-columns: minmax(190px, 1.7fr) minmax(120px, 0.8fr) minmax(120px, 1fr) minmax(120px, 1fr);
+    align-items: end;
+    padding: 0.7rem;
+    background: #191919;
+    border: 1px solid #333;
+    border-radius: 6px;
+  }
+
+  .submission-number-heading {
+    align-self: center;
+  }
+
+  .submission-number-control {
+    display: grid;
+    gap: 4px;
+  }
+
+  .submission-number-control span {
+    color: var(--muted);
+    font-size: 0.68rem;
+  }
+
+  .submission-number input,
+  .submission-number select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .kinetics-section {
+    margin: 10px 0;
+    padding: 0.8rem;
+    border: 1px solid #444;
+    border-radius: 6px;
+  }
+
+  .kinetics-section legend {
+    padding: 0 0.35rem;
+    color: #ddd;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .kinetics-representation {
+    display: grid;
+    grid-template-columns: minmax(190px, 1.7fr) minmax(0, 2.8fr);
+    align-items: end;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .kinetics-representation select {
+    width: 100%;
+  }
+
+  .submission-error {
+    min-height: 1.2rem;
+    margin-top: 0.8rem;
+    color: #ff8d8d;
+    font-size: 0.78rem;
+  }
+
+  .submission-status {
+    min-height: 1.2rem;
+    margin-top: 0.35rem;
+    color: #9ee6a5;
+    font-size: 0.78rem;
+  }
+
+  .submission-actions {
+    position: sticky;
+    bottom: -1rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    margin: 1rem -1rem -1rem;
+    padding: 0.8rem 1rem;
+    background: var(--panel-light);
+    border-top: 1px solid var(--border);
+  }
+
   #detail-fields dt {
     color: var(--muted);
     font-weight: 600;
@@ -578,6 +787,18 @@
     #filters {
       grid-template-columns: 1fr 1fr;
     }
+
+    .submission-basic-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .submission-number {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .submission-number-heading {
+      grid-column: 1 / -1;
+    }
   }
 
   @media (max-width: 560px) {
@@ -587,6 +808,19 @@
 
     #filters {
       grid-template-columns: 1fr;
+    }
+
+    .explorer-heading-row {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .record-actions {
+      justify-content: stretch;
+    }
+
+    .record-actions button {
+      flex: 1 1 auto;
     }
 
     #plot {
@@ -606,6 +840,20 @@
     #detail-fields dd {
       padding-top: 0.1rem;
     }
+
+    .submission-basic-grid,
+    .submission-number,
+    .kinetics-representation {
+      grid-template-columns: 1fr;
+    }
+
+    .submission-number-heading {
+      grid-column: auto;
+    }
+
+    .submission-actions button {
+      flex: 1 1 100%;
+    }
   }
 </style>
 </head>
@@ -619,6 +867,13 @@
     <section id="plot" aria-label="Interactive 3D plot of filtered sorbents"></section>
     <section id="sidepanel" aria-labelledby="plot-mappings-title">
       <h2 id="plot-mappings-title" class="panel-heading">Plot mappings</h2>
+      <div class="plot-mode-control">
+        <label for="plot-mode">Plot type</label>
+        <select id="plot-mode">
+          <option value="3d" selected>3D</option>
+          <option value="2d">2D</option>
+        </select>
+      </div>
       <div class="mapping-grid">
         <div class="mapping-control">
           <label for="x-expression">X equation</label>
@@ -642,14 +897,14 @@
           <label for="y-title">Y axis title</label>
           <input type="text" id="y-title">
         </div>
-        <div class="mapping-control">
+        <div class="mapping-control z-control">
           <label for="z-expression">Z equation</label>
           <div>
             <input type="text" id="z-expression" spellcheck="false" autocomplete="off">
             <p id="z-expression-error" class="formula-error" aria-live="polite"></p>
           </div>
         </div>
-        <div class="mapping-control">
+        <div class="mapping-control z-control">
           <label for="z-title">Z axis title</label>
           <input type="text" id="z-title">
         </div>
@@ -700,10 +955,10 @@
               <input type="checkbox" id="y-log" aria-label="Logarithmic Y axis">
             </label>
 
-            <label for="z-min">Z</label>
-            <input type="number" id="z-min" step="any" placeholder="Auto" aria-label="Z minimum">
-            <input type="number" id="z-max" step="any" placeholder="Auto" aria-label="Z maximum">
-            <label class="log-toggle" title="Use a logarithmic Z axis">
+            <label class="z-control" for="z-min">Z</label>
+            <input class="z-control" type="number" id="z-min" step="any" placeholder="Auto" aria-label="Z minimum">
+            <input class="z-control" type="number" id="z-max" step="any" placeholder="Auto" aria-label="Z maximum">
+            <label class="log-toggle z-control" title="Use a logarithmic Z axis">
               <input type="checkbox" id="z-log" aria-label="Logarithmic Z axis">
             </label>
 
@@ -728,7 +983,16 @@
           </div>
         </div>
       </details>
-      <button type="button" id="export-plot" disabled>Export transparent SVG</button>
+      <div class="export-controls">
+        <select id="export-format" aria-label="Export format">
+          <option value="svg" selected>SVG</option>
+          <option value="png">PNG</option>
+          <option value="csv">CSV (plotted data)</option>
+          <option value="python">Python script</option>
+        </select>
+        <button type="button" id="export-plot" disabled>Export</button>
+        <p class="export-hint">Images export the current figure. CSV and Python include only records represented in the active, filtered plot.</p>
+      </div>
       <div id="status" role="status" aria-live="polite">Loading data…</div>
     </section>
 
@@ -764,9 +1028,15 @@
   </div>
 
   <section id="explorer" aria-labelledby="explorer-title">
-    <h2 id="explorer-title" class="section-heading">Explore the complete dataset</h2>
+    <div class="explorer-heading-row">
+      <h2 id="explorer-title" class="section-heading">Explore the complete dataset</h2>
+      <div class="record-actions">
+        <button type="button" id="add-local-record">Add record locally</button>
+        <button type="button" id="share-data" class="primary-action">Share data with curators</button>
+      </div>
+    </div>
     <p class="section-description">
-      Search and filter every named sorbent, including records without enough data for the 3D
+      Search and filter every named sorbent, including records without enough data for the active
       model. Select “View” to inspect all source fields.
     </p>
 
@@ -826,9 +1096,544 @@
   <dl id="detail-fields"></dl>
 </dialog>
 
+<dialog id="submission-dialog" aria-labelledby="submission-title">
+  <div class="dialog-header">
+    <h2 id="submission-title">Share data with curators</h2>
+    <button type="button" id="close-submission" aria-label="Close data form">×</button>
+  </div>
+  <form id="submission-form" novalidate>
+    <p class="submission-intro">
+      Compare your result with published CO₂ sorbents and help expand the database. Adding a record here is local only; emailing it shares the data with the curators, who will verify it before inclusion in the curated dataset.
+    </p>
+    <div class="submission-basic-grid">
+      <div class="submission-field">
+        <label for="material-name">Material name</label>
+        <input type="text" id="material-name" autocomplete="off">
+        <p class="submission-definition">Required to identify the local point and submission.</p>
+      </div>
+      <div class="submission-field">
+        <label for="capture-method">Capture method</label>
+        <input type="text" id="capture-method" list="capture-method-options" autocomplete="off" placeholder="Missing / not reported">
+        <datalist id="capture-method-options">
+          <option value="Physical adsorption"></option>
+          <option value="Chemical adsorption"></option>
+          <option value="Electro adsorption"></option>
+          <option value="Physical absorption"></option>
+          <option value="Chemical absorption"></option>
+          <option value="Electro absorption"></option>
+          <option value="Thermal swing"></option>
+          <option value="Pressure swing"></option>
+          <option value="N/A"></option>
+        </datalist>
+        <p class="submission-definition">Mechanism governing the sorbent's affinity toward CO₂.</p>
+      </div>
+      <div class="submission-field">
+        <label for="solvent">Solvent</label>
+        <select id="solvent">
+          <option value="">Missing / not reported</option>
+          <option value="Aq">Aq — aqueous</option>
+          <option value="Org">Org — organic</option>
+          <option value="IL">IL — ionic liquid</option>
+          <option value="N/A">Not applicable</option>
+        </select>
+        <p class="submission-definition">Aqueous, organic, or ionic-liquid solvent.</p>
+      </div>
+    </div>
+
+    <div id="submission-primary-fields" class="submission-fields"></div>
+
+    <fieldset class="kinetics-section">
+      <legend>Reaction kinetics</legend>
+      <div class="kinetics-representation">
+        <div class="submission-field">
+          <label for="kinetics-type">Representation</label>
+          <select id="kinetics-type">
+            <option value="">Missing / not reported</option>
+            <option value="t90">t90 for solids (min)</option>
+            <option value="kapp">k_app for liquids (s⁻¹)</option>
+            <option value="na">Not applicable</option>
+          </select>
+        </div>
+        <p id="kinetics-definition" class="submission-definition">Choose the reported representation; both are not required.</p>
+      </div>
+      <div id="kinetics-numeric-field"></div>
+    </fieldset>
+
+    <div id="submission-secondary-fields" class="submission-fields"></div>
+    <p id="submission-error" class="submission-error" role="alert"></p>
+    <p id="submission-status" class="submission-status" role="status" aria-live="polite"></p>
+    <div class="submission-actions">
+      <button type="button" id="reset-submission">Clear form</button>
+      <button type="button" id="add-submission-local">Add to local table and plot</button>
+      <button type="button" id="send-submission" class="primary-action" disabled>Send data to curators</button>
+    </div>
+  </form>
+</dialog>
+
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.35.2/plotly.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script id="app-core">
+(function initializeCore(globalScope) {
+  "use strict";
+
+  const MISSING_VALUE = "NR";
+  const NOT_APPLICABLE_VALUE = "N/A";
+
+  const SOURCE_FIELDS = [
+    "sorbent category",
+    "sorbent class",
+    "sorbent name",
+    "capture method",
+    "capture temperature",
+    "total pressure",
+    "co2 concentration",
+    "reaction enthalpy",
+    "maximum capacity",
+    "reaction kinetics",
+    "reaction kinetics 2",
+    "cyclic stability",
+    "maximum cycles",
+    "capacity at max cycle",
+    "viscosity",
+    "corrosivity",
+    "volatility",
+    "sorbent cost",
+    "selectivity (n2)",
+    "reference",
+    "year of publication",
+    "comments",
+  ];
+
+  const NUMERIC_SUBMISSION_FIELDS = [
+    {
+      id: "captureTemperature",
+      label: "Capture temperature",
+      symbol: "T_C",
+      unit: "°C",
+      schemaField: "capture temperature",
+      definition: "Operating temperature at which CO₂ adsorption or absorption occurs.",
+    },
+    {
+      id: "totalPressure",
+      label: "Total pressure",
+      symbol: "P",
+      unit: "bar",
+      schemaField: "total pressure",
+      definition: "Operating pressure at which CO₂ adsorption or absorption occurs.",
+    },
+    {
+      id: "co2Concentration",
+      label: "CO₂ concentration",
+      symbol: "C_CO2",
+      unit: "%",
+      schemaField: "co2 concentration",
+      definition: "Mole or volume fraction of CO₂ in the gas mixture as a percentage of the total gas composition.",
+    },
+    {
+      id: "reactionEnthalpy",
+      label: "Reaction enthalpy",
+      symbol: "ΔH",
+      unit: "kJ mol⁻¹",
+      schemaField: "reaction enthalpy",
+      definition: "Enthalpy of capture by absorption or adsorption per mol CO₂ under expected operating conditions.",
+    },
+    {
+      id: "maximumCapacity",
+      label: "Maximum capacity",
+      symbol: "C",
+      unit: "mol kg⁻¹",
+      schemaField: "maximum capacity",
+      definition: "Equilibrium loading of CO₂ under expected operating conditions.",
+    },
+    {
+      id: "selectivity",
+      label: "Selectivity (CO₂/N₂)",
+      symbol: "S",
+      unit: "",
+      schemaField: "selectivity (n2)",
+      definition: "Ratio of CO₂ sorbed relative to N₂, normalized by their respective feed concentrations.",
+    },
+    {
+      id: "cyclicStability",
+      label: "Cyclic stability",
+      symbol: "Q2",
+      unit: "%",
+      schemaField: "cyclic stability",
+      definition: "Capacity of the second cycle as a percentage of the first cycle.",
+    },
+    {
+      id: "longTermCyclability",
+      label: "Long-term cyclability",
+      symbol: "Qn",
+      unit: "%",
+      schemaField: "capacity at max cycle",
+      definition: "Capacity of the last reported cycle as a percentage of the first cycle.",
+    },
+    {
+      id: "sorbentCost",
+      label: "Sorbent cost",
+      symbol: "",
+      unit: "€ kg⁻¹",
+      schemaField: "sorbent cost",
+      definition: "Price of 1 kg of sorbent.",
+    },
+    {
+      id: "corrosivity",
+      label: "Corrosivity",
+      symbol: "",
+      unit: "µm year⁻¹",
+      schemaField: "corrosivity",
+      definition: "Extent of corrosion in micrometers per year.",
+    },
+    {
+      id: "volatility",
+      label: "Volatility",
+      symbol: "",
+      unit: "kPa",
+      schemaField: "volatility",
+      definition: "Vapor pressure under expected operating conditions.",
+    },
+    {
+      id: "viscosity",
+      label: "Viscosity",
+      symbol: "",
+      unit: "mPa s",
+      schemaField: "viscosity",
+      definition: "Resistance of a liquid to flow or deformation under an applied shear stress.",
+    },
+  ];
+
+  const KINETICS_FIELD = {
+    id: "reactionKinetics",
+    label: "Reaction kinetics",
+    definitions: {
+      t90: {
+        symbol: "t90",
+        unit: "min",
+        schemaField: "reaction kinetics",
+        definition: "For solids: time required to achieve 90% of maximum capacity.",
+      },
+      kapp: {
+        symbol: "k_app",
+        unit: "s⁻¹",
+        schemaField: "reaction kinetics 2",
+        definition: "For liquids: observed pseudo-first-order reaction rate constant.",
+      },
+    },
+  };
+
+  function displayFieldName(field) {
+    const details = [field.symbol, field.unit].filter(Boolean).join(", ");
+    return details ? `${field.label} (${details})` : field.label;
+  }
+
+  function normalizeText(value) {
+    const text = String(value ?? "").trim();
+    return text || MISSING_VALUE;
+  }
+
+  function numericDisplay(entry) {
+    if (!entry || entry.status === "missing") return "Missing";
+    if (entry.status === "na") return "Not applicable";
+    return String(entry.value);
+  }
+
+  function numericToSource(entry) {
+    if (!entry || entry.status === "missing") return MISSING_VALUE;
+    if (entry.status === "na") return NOT_APPLICABLE_VALUE;
+    return String(entry.value).trim();
+  }
+
+  function validateSubmission(submission) {
+    const errors = {};
+    if (!String(submission.materialName ?? "").trim()) {
+      errors.materialName = "Enter a material name.";
+    }
+
+    const fields = [...NUMERIC_SUBMISSION_FIELDS, KINETICS_FIELD];
+    for (const field of fields) {
+      const entry = submission[field.id];
+      if (!entry || entry.status !== "value") continue;
+
+      const valueText = String(entry.value ?? "").trim();
+      if (valueText === "" || !Number.isFinite(Number(valueText))) {
+        errors[`${field.id}.value`] = "Enter a finite number, or choose Missing or Not applicable.";
+      }
+
+      const uncertaintyText = String(entry.uncertainty ?? "").trim();
+      if (uncertaintyText !== ""
+          && (!Number.isFinite(Number(uncertaintyText)) || Number(uncertaintyText) < 0)) {
+        errors[`${field.id}.uncertainty`] = "Uncertainty must be a non-negative finite number.";
+      }
+    }
+
+    if (submission.reactionKinetics?.status === "value"
+        && !Object.hasOwn(KINETICS_FIELD.definitions, submission.kineticsType)) {
+      errors.kineticsType = "Choose t90 for a solid or k_app for a liquid.";
+    }
+
+    return errors;
+  }
+
+  function buildLocalSource(submission) {
+    const source = Object.fromEntries(SOURCE_FIELDS.map(field => [field, MISSING_VALUE]));
+    source["sorbent name"] = String(submission.materialName ?? "").trim();
+    source["capture method"] = normalizeText(submission.captureMethod);
+
+    for (const field of NUMERIC_SUBMISSION_FIELDS) {
+      source[field.schemaField] = numericToSource(submission[field.id]);
+    }
+
+    const kinetics = submission.reactionKinetics;
+    if (submission.kineticsType === "t90") {
+      source["reaction kinetics"] = numericToSource(kinetics);
+      source["reaction kinetics 2"] = NOT_APPLICABLE_VALUE;
+    } else if (submission.kineticsType === "kapp") {
+      source["reaction kinetics"] = NOT_APPLICABLE_VALUE;
+      source["reaction kinetics 2"] = numericToSource(kinetics);
+    } else if (submission.kineticsType === "na") {
+      source["reaction kinetics"] = NOT_APPLICABLE_VALUE;
+      source["reaction kinetics 2"] = NOT_APPLICABLE_VALUE;
+    }
+
+    source.reference = "Local browser entry — not curated";
+    const notes = ["Local browser-only record"];
+    const solvent = normalizeText(submission.solvent);
+    notes.push(`Solvent: ${solvent}`);
+    notes.push("Local sorbent cost, when supplied, is reported in € kg⁻¹");
+
+    const uncertaintyFields = [...NUMERIC_SUBMISSION_FIELDS];
+    if (Object.hasOwn(KINETICS_FIELD.definitions, submission.kineticsType)) {
+      uncertaintyFields.push({
+        ...KINETICS_FIELD,
+        ...KINETICS_FIELD.definitions[submission.kineticsType],
+      });
+    }
+    for (const field of uncertaintyFields) {
+      const entry = submission[field.id];
+      const uncertainty = String(entry?.uncertainty ?? "").trim();
+      if (entry?.status === "value" && uncertainty !== "") {
+        const unit = field.unit ? ` ${field.unit}` : "";
+        notes.push(`${field.label} uncertainty: ±${uncertainty}${unit}`);
+      }
+    }
+    source.comments = notes.join("; ");
+    return source;
+  }
+
+  function formatSubmissionEmail(submission) {
+    const lines = [
+      "CO2 sorbents database — new data submission",
+      "",
+      "The following data are submitted for curator review. Adding this record locally did not modify the curated database.",
+      "",
+      `Material name: ${normalizeText(submission.materialName)}`,
+      `Capture method: ${normalizeText(submission.captureMethod)}`,
+      `Solvent: ${normalizeText(submission.solvent)}`,
+      "",
+    ];
+
+    for (const field of NUMERIC_SUBMISSION_FIELDS.slice(0, 5)) {
+      appendNumericEmailField(lines, field, submission[field.id]);
+    }
+
+    const kineticsDefinition = KINETICS_FIELD.definitions[submission.kineticsType];
+    const kineticsField = kineticsDefinition
+      ? { ...KINETICS_FIELD, ...kineticsDefinition }
+      : { ...KINETICS_FIELD, symbol: "", unit: "" };
+    appendNumericEmailField(lines, kineticsField, submission.reactionKinetics);
+    lines.push(`  Representation: ${kineticsDefinition ? kineticsDefinition.symbol : normalizeText(submission.kineticsType)}`);
+    lines.push("");
+
+    for (const field of NUMERIC_SUBMISSION_FIELDS.slice(5)) {
+      appendNumericEmailField(lines, field, submission[field.id]);
+    }
+
+    lines.push("Please verify these data before permanent inclusion in the curated dataset.");
+    return lines.join("\n");
+  }
+
+  function appendNumericEmailField(lines, field, entry) {
+    lines.push(`${displayFieldName(field)}:`);
+    lines.push(`  Value: ${numericDisplay(entry)}`);
+    const uncertainty = entry?.status === "value" && String(entry.uncertainty ?? "").trim() !== ""
+      ? String(entry.uncertainty).trim()
+      : "Missing";
+    lines.push(`  Uncertainty: ${uncertainty}`);
+    lines.push("");
+  }
+
+  function buildMailto(submission) {
+    const address = "anna.stepanova@gmail.com";
+    const subject = "CO2 sorbents database – new data submission";
+    const body = formatSubmissionEmail(submission);
+    return `mailto:${address}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+
+  function csvEscape(value) {
+    const text = String(value ?? "");
+    return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+  }
+
+  function serializeCSV(rows, columns) {
+    const lines = [columns.map(csvEscape).join(",")];
+    for (const row of rows) {
+      lines.push(columns.map(column => csvEscape(row[column])).join(","));
+    }
+    return lines.join("\r\n");
+  }
+
+  function encodeBase64Utf8(text) {
+    if (typeof Buffer !== "undefined") return Buffer.from(text, "utf8").toString("base64");
+    const bytes = new TextEncoder().encode(text);
+    let binary = "";
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    return btoa(binary);
+  }
+
+  function buildPythonScript(options) {
+    const csv = serializeCSV(options.rows, options.columns);
+    const encodedData = encodeBase64Utf8(csv);
+    const config = JSON.stringify(options.config);
+
+    return `import base64
+import io
+import json
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from matplotlib.cm import ScalarMappable
+from matplotlib.colors import LogNorm, Normalize
+
+DATA_CSV_BASE64 = "${encodedData}"
+PLOT_CONFIG = json.loads(r'''${config}''')
+
+csv_text = base64.b64decode(DATA_CSV_BASE64).decode("utf-8")
+data = pd.read_csv(io.StringIO(csv_text), keep_default_na=False)
+
+numeric_columns = ["plot x", "plot y", "marker size value", "marker color value"]
+if PLOT_CONFIG["mode"] == "3d":
+    numeric_columns.append("plot z")
+for column in numeric_columns:
+    data[column] = pd.to_numeric(data[column], errors="coerce")
+data = data.dropna(subset=numeric_columns)
+
+def limits(values, mapping):
+    if len(values) == 0:
+        fallback_minimum = 1.0 if mapping["scale"] == "log" else 0.0
+        fallback_maximum = 10.0 if mapping["scale"] == "log" else 1.0
+    else:
+        fallback_minimum = float(values.min())
+        fallback_maximum = float(values.max())
+    minimum = mapping["min"] if mapping["min"] is not None else fallback_minimum
+    maximum = mapping["max"] if mapping["max"] is not None else fallback_maximum
+    if minimum == maximum:
+        if mapping["scale"] == "log":
+            minimum /= 10
+            maximum *= 10
+        else:
+            padding = max(abs(minimum) * 0.05, 0.5)
+            minimum -= padding
+            maximum += padding
+    return minimum, maximum
+
+def marker_sizes(values, mapping):
+    minimum, maximum = limits(values, mapping)
+    plotted = np.log10(values) if mapping["scale"] == "log" else values
+    lower = np.log10(minimum) if mapping["scale"] == "log" else minimum
+    upper = np.log10(maximum) if mapping["scale"] == "log" else maximum
+    normalized = np.clip((plotted - lower) / (upper - lower), 0, 1)
+    return 25 + np.sqrt(normalized) * 225
+
+mode = PLOT_CONFIG["mode"]
+mappings = PLOT_CONFIG["mappings"]
+palette_names = {"RdYlGn_r": "RdYlGn_r", "Viridis": "viridis", "Cividis": "cividis"}
+cmap = plt.get_cmap(palette_names.get(PLOT_CONFIG["palette"], "viridis"))
+color_min, color_max = limits(data["marker color value"], mappings["color"])
+norm = LogNorm(color_min, color_max, clip=True) if mappings["color"]["scale"] == "log" else Normalize(color_min, color_max, clip=True)
+sizes = marker_sizes(data["marker size value"], mappings["size"])
+
+fig = plt.figure(figsize=(9, 7))
+ax = fig.add_subplot(111, projection="3d" if mode == "3d" else None)
+for is_local, marker, label in [(False, "o", "Curated"), (True, "D", "Local")]:
+    subset = data["record provenance"].eq("local") == is_local
+    if not subset.any():
+        continue
+    arguments = {
+        "s": sizes[subset],
+        "c": data.loc[subset, "marker color value"],
+        "cmap": cmap,
+        "norm": norm,
+        "marker": marker,
+        "alpha": 0.9,
+        "edgecolors": "white",
+        "linewidths": 0.5,
+        "label": label,
+    }
+    if mode == "3d":
+        ax.scatter(data.loc[subset, "plot x"], data.loc[subset, "plot y"], data.loc[subset, "plot z"], **arguments)
+    else:
+        ax.scatter(data.loc[subset, "plot x"], data.loc[subset, "plot y"], **arguments)
+
+ax.set_xlabel(mappings["x"]["title"])
+ax.set_ylabel(mappings["y"]["title"])
+if mode == "3d":
+    ax.set_zlabel(mappings["z"]["title"])
+
+for axis_name, axis in [("x", ax.xaxis), ("y", ax.yaxis)]:
+    mapping = mappings[axis_name]
+    getattr(ax, f"set_{axis_name}scale")(mapping["scale"])
+    if mapping["min"] is not None or mapping["max"] is not None:
+        getattr(ax, f"set_{axis_name}lim")(limits(data[f"plot {axis_name}"], mapping))
+if mode == "3d":
+    mapping = mappings["z"]
+    ax.set_zscale(mapping["scale"])
+    if mapping["min"] is not None or mapping["max"] is not None:
+        ax.set_zlim(limits(data["plot z"], mapping))
+
+colorbar = fig.colorbar(ScalarMappable(norm=norm, cmap=cmap), ax=ax, pad=0.12)
+colorbar.set_label(mappings["color"]["title"])
+if data["record provenance"].eq("local").any():
+    ax.legend()
+ax.grid(True, alpha=0.3)
+fig.tight_layout()
+fig.savefig("co2-sorbents-plot.png", dpi=300, transparent=True, bbox_inches="tight")
+plt.show()
+`;
+  }
+
+  const api = {
+    KINETICS_FIELD,
+    MISSING_VALUE,
+    NOT_APPLICABLE_VALUE,
+    NUMERIC_SUBMISSION_FIELDS,
+    SOURCE_FIELDS,
+    buildLocalSource,
+    buildMailto,
+    buildPythonScript,
+    displayFieldName,
+    formatSubmissionEmail,
+    serializeCSV,
+    validateSubmission,
+  };
+
+  globalScope.CO2AppCore = api;
+  if (typeof module !== "undefined" && module.exports) module.exports = api;
+}(typeof globalThis !== "undefined" ? globalThis : this));
+</script>
 <script>
+const {
+  SOURCE_FIELDS,
+  NUMERIC_SUBMISSION_FIELDS,
+  KINETICS_FIELD,
+  validateSubmission,
+  buildLocalSource,
+  buildMailto,
+  serializeCSV,
+  buildPythonScript,
+} = CO2AppCore;
+
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSrocYVch0p6yXg-tc6RrSRPpx1v1POsZT9gfKeCPJ5wKCNRD40LxtIlI3llEtRY1WdJpSSs5T7D1kG/pub?gid=159971136&single=true&output=csv";
 
 const MARKER = {
@@ -855,7 +1660,7 @@ const TABLE_COLUMNS = [
   { key: "reaction enthalpy", label: "Enthalpy (kJ/mol)", numeric: true },
   { key: "maximum capacity", label: "Capacity (mol/kg)", numeric: true },
   { key: "reaction kinetics", label: "Kinetics (min)", numeric: true },
-  { key: "sorbent cost", label: "Cost ($/kg)", numeric: true },
+  { key: "sorbent cost", label: "Cost (€/kg)", numeric: true },
   { key: "year of publication", label: "Year" },
 ];
 
@@ -877,7 +1682,7 @@ const FIELD_UNITS = {
   "viscosity": "mPa·s",
   "corrosivity": "µm/yr",
   "volatility": "kPa",
-  "sorbent cost": "$/kg",
+  "sorbent cost": "€/kg",
 };
 
 const DEFAULT_MAPPINGS = {
@@ -952,7 +1757,9 @@ const UI = {
   plot: document.getElementById("plot"),
   status: document.getElementById("status"),
   resultSummary: document.getElementById("result-summary"),
+  plotMode: document.getElementById("plot-mode"),
   exportPlot: document.getElementById("export-plot"),
+  exportFormat: document.getElementById("export-format"),
   colorScale: document.getElementById("color-scale"),
   rangeError: document.getElementById("range-settings-error"),
   userVariableList: document.getElementById("user-variable-list"),
@@ -973,6 +1780,25 @@ const UI = {
   pageSize: document.getElementById("page-size"),
   addVariable: document.getElementById("add-variable"),
   closeDialog: document.getElementById("close-dialog"),
+  addLocalRecord: document.getElementById("add-local-record"),
+  shareData: document.getElementById("share-data"),
+  submissionDialog: document.getElementById("submission-dialog"),
+  submissionTitle: document.getElementById("submission-title"),
+  submissionForm: document.getElementById("submission-form"),
+  closeSubmission: document.getElementById("close-submission"),
+  resetSubmission: document.getElementById("reset-submission"),
+  addSubmissionLocal: document.getElementById("add-submission-local"),
+  sendSubmission: document.getElementById("send-submission"),
+  submissionError: document.getElementById("submission-error"),
+  submissionStatus: document.getElementById("submission-status"),
+  materialName: document.getElementById("material-name"),
+  captureMethod: document.getElementById("capture-method"),
+  solvent: document.getElementById("solvent"),
+  kineticsType: document.getElementById("kinetics-type"),
+  kineticsDefinition: document.getElementById("kinetics-definition"),
+  primarySubmissionFields: document.getElementById("submission-primary-fields"),
+  secondarySubmissionFields: document.getElementById("submission-secondary-fields"),
+  kineticsNumericField: document.getElementById("kinetics-numeric-field"),
 };
 
 const MAPPING_CONTROLS = Object.fromEntries(MAPPING_NAMES.map(name => [name, {
@@ -1005,7 +1831,7 @@ const FORMULA_VARIABLES = [
   { symbol: "v", field: "viscosity", label: "viscosity", unit: "mPa·s" },
   { symbol: "r", field: "corrosivity", label: "corrosivity", unit: "µm/yr" },
   { symbol: "vp", field: "volatility", label: "volatility", unit: "kPa" },
-  { symbol: "cS", field: "sorbent cost", label: "sorbent cost", unit: "$/kg", parse: parseSorbentCost },
+  { symbol: "cS", field: "sorbent cost", label: "sorbent cost", unit: "€/kg", parse: parseSorbentCost },
   { symbol: "sN2", field: "selectivity (n2)", label: "selectivity (N₂)" },
 ];
 
@@ -1021,7 +1847,7 @@ function parseNum(value, stringsToRemove = []) {
 }
 
 function parseSorbentCost(value) {
-  return parseNum(value, ["$", "/kg"]);
+  return parseNum(value, ["$", "€", "/kg"]);
 }
 
 function rateConstantToMinutes(value) {
@@ -1288,7 +2114,7 @@ function parseCSV(text) {
   return result.data;
 }
 
-function createRecord(source) {
+function createRecord(source, options = {}) {
   const formulaValues = Object.create(null);
 
   for (const variable of FORMULA_VARIABLES) {
@@ -1304,6 +2130,9 @@ function createRecord(source) {
     name: source["sorbent name"]?.trim() ?? "",
     searchText: Object.values(source).join(" ").toLowerCase(),
     formulaValues,
+    local: Boolean(options.local),
+    localId: options.localId ?? null,
+    submission: options.submission ?? null,
   };
 }
 
@@ -1395,7 +2224,11 @@ function getPlotMappings() {
   const userVariables = getUserVariables();
   const userSymbols = Object.keys(userVariables);
 
-  for (const mappingName of MAPPING_NAMES) {
+  const activeMappingNames = state.plotMode === "2d"
+    ? ["x", "y", "size", "color"]
+    : MAPPING_NAMES;
+
+  for (const mappingName of activeMappingNames) {
     const controls = MAPPING_CONTROLS[mappingName];
     const expression = controls.expression.value.trim();
     const scale = controls.log.checked ? "log" : "linear";
@@ -1430,13 +2263,16 @@ function getPlotMappings() {
 
 function createPlotPoints(rows, mappings) {
   const points = [];
+  const activeMappingNames = state.plotMode === "2d"
+    ? ["x", "y", "size", "color"]
+    : MAPPING_NAMES;
 
   for (const row of rows) {
     const context = { ...row.formulaValues, ...mappings.userVariables };
     const values = {};
     let valid = true;
 
-    for (const name of MAPPING_NAMES) {
+    for (const name of activeMappingNames) {
       const value = mappings[name].evaluate(context);
       if (!Number.isFinite(value) || (mappings[name].scale === "log" && value <= 0)) {
         valid = false;
@@ -1445,7 +2281,7 @@ function createPlotPoints(rows, mappings) {
       values[name] = value;
     }
 
-    if (valid) points.push({ name: row.name, ...values });
+    if (valid) points.push({ name: row.name, record: row, ...values });
   }
 
   return points;
@@ -1531,16 +2367,18 @@ function makeLogColorbarTicks(min, max) {
   };
 }
 
-function makeAxisConfig(mapping, values) {
+function makeAxisConfig(mapping, values, is3D = false) {
   const config = {
     title: { text: mapping.title || mapping.expression, font: { size: 14 } },
     type: mapping.scale,
-    showbackground: false,
-    backgroundcolor: TRANSPARENT,
     gridcolor: "#444",
     zerolinecolor: "#555",
     tickfont: { color: "#ccc", size: 12 },
   };
+  if (is3D) {
+    config.showbackground = false;
+    config.backgroundcolor = TRANSPARENT;
+  }
 
   if (mapping.min !== null || mapping.max !== null) {
     const range = resolveScaleRange(
@@ -1556,7 +2394,8 @@ function makeAxisConfig(mapping, values) {
   return config;
 }
 
-function makeFigure(points, mappings) {
+function makeFigure(points, mappings, plotMode) {
+  const is3D = plotMode === "3d";
   const names = [];
   const xs = [];
   const ys = [];
@@ -1564,15 +2403,17 @@ function makeFigure(points, mappings) {
   const sizeValues = [];
   const colors = [];
   const customdata = [];
+  const symbols = [];
 
   for (const point of points) {
     names.push(point.name);
     xs.push(point.x);
     ys.push(point.y);
-    zs.push(point.z);
+    if (is3D) zs.push(point.z);
     sizeValues.push(point.size);
     colors.push(point.color);
-    customdata.push([point.size, point.color]);
+    customdata.push([point.size, point.color, point.record.local ? "Local — not curated" : "Curated"]);
+    symbols.push(point.record.local ? "diamond" : "circle");
   }
 
   const sizes = scaleMarkerSizes(sizeValues, mappings.size);
@@ -1589,7 +2430,8 @@ function makeFigure(points, mappings) {
   const plottedColorRange = logarithmicColor
     ? { min: Math.log10(colorRange.min), max: Math.log10(colorRange.max) }
     : colorRange;
-  const hoverLabels = Object.fromEntries(MAPPING_NAMES.map(mappingName => [
+  const activeMappingNames = is3D ? MAPPING_NAMES : ["x", "y", "size", "color"];
+  const hoverLabels = Object.fromEntries(activeMappingNames.map(mappingName => [
     mappingName,
     (mappings[mappingName].title || mappings[mappingName].expression)
       .replaceAll("&", "&amp;")
@@ -1613,23 +2455,24 @@ function makeFigure(points, mappings) {
   }
 
   const trace = {
-    type: "scatter3d",
+    type: is3D ? "scatter3d" : "scatter",
     mode: "markers",
     x: xs,
     y: ys,
-    z: zs,
     text: names,
     customdata,
     hovertemplate: [
       "<b>%{text}</b>",
       `${hoverLabels.x}: %{x:.3g}`,
       `${hoverLabels.y}: %{y:.3g}`,
-      `${hoverLabels.z}: %{z:.3g}`,
+      ...(is3D ? [`${hoverLabels.z}: %{z:.3g}`] : []),
       `${hoverLabels.size}: %{customdata[0]:.3g}`,
-      `${hoverLabels.color}: %{customdata[1]:.3g}<extra></extra>`,
+      `${hoverLabels.color}: %{customdata[1]:.3g}`,
+      "Source: %{customdata[2]}<extra></extra>",
     ].join("<br>"),
     marker: {
       size: sizes,
+      symbol: symbols,
       color: plottedColors,
       colorscale: mappings.color.colorScale.colors,
       cmin: plottedColorRange.min,
@@ -1639,6 +2482,7 @@ function makeFigure(points, mappings) {
       line: { width: 0.5, color: "#fff" },
     },
   };
+  if (is3D) trace.z = zs;
 
   const plotSize = getPlotSize();
   const layout = {
@@ -1648,16 +2492,24 @@ function makeFigure(points, mappings) {
     margin: { l: 0, r: 0, t: 30, b: 0 },
     width: plotSize.width,
     height: plotSize.height,
-    scene: {
+    uirevision: plotMode,
+  };
+
+  if (is3D) {
+    layout.scene = {
       bgcolor: TRANSPARENT,
       aspectmode: "cube",
       domain: { x: [0, 0.88], y: [0, 1] },
       camera: CAMERA,
-      xaxis: makeAxisConfig(mappings.x, xs),
-      yaxis: makeAxisConfig(mappings.y, ys),
-      zaxis: makeAxisConfig(mappings.z, zs),
-    },
-  };
+      xaxis: makeAxisConfig(mappings.x, xs, true),
+      yaxis: makeAxisConfig(mappings.y, ys, true),
+      zaxis: makeAxisConfig(mappings.z, zs, true),
+    };
+  } else {
+    layout.margin = { l: 85, r: 90, t: 30, b: 75 };
+    layout.xaxis = makeAxisConfig(mappings.x, xs);
+    layout.yaxis = makeAxisConfig(mappings.y, ys);
+  }
 
   if (points.length === 0) {
     layout.annotations = [{
@@ -1675,12 +2527,20 @@ function makeFigure(points, mappings) {
 }
 
 const state = {
+  curatedRecords: [],
+  localRecords: [],
   records: [],
   filteredRecords: [],
   sortedRecords: [],
   currentPage: 1,
   pageSize: PAGE_SIZE,
   sort: { key: "sorbent name", direction: 1 },
+  plotMode: "3d",
+  localSequence: 0,
+  editingLocalId: null,
+  currentSubmission: null,
+  submissionAdded: false,
+  lastPlot: null,
 };
 
 function addUserVariable(name = "", value = "") {
@@ -1763,6 +2623,21 @@ function initializePlotControls() {
     symbolRows.appendChild(row);
   }
   UI.formulaSymbols.appendChild(symbolRows);
+  setPlotMode("3d", false);
+}
+
+function setPlotMode(mode, render = true) {
+  state.plotMode = mode === "2d" ? "2d" : "3d";
+  UI.plotMode.value = state.plotMode;
+  UI.plot.setAttribute("aria-label", `Interactive ${state.plotMode.toUpperCase()} plot of filtered sorbents`);
+  for (const element of document.querySelectorAll(".z-control")) {
+    element.hidden = state.plotMode === "2d";
+    if (element.matches("input, select, button")) element.disabled = state.plotMode === "2d";
+    for (const control of element.querySelectorAll("input, select, button")) {
+      control.disabled = state.plotMode === "2d";
+    }
+  }
+  if (render && state.records.length > 0) renderPlot();
 }
 
 function populateSelect(select, values) {
@@ -1782,6 +2657,19 @@ function populateSelect(select, values) {
 function initializeFilters() {
   populateSelect(UI.categoryFilter, state.records.map(record => record.source["sorbent category"] ?? ""));
   populateSelect(UI.methodFilter, state.records.map(record => record.source["capture method"] ?? ""));
+}
+
+function ensureFilterOption(select, value) {
+  const text = String(value ?? "").trim();
+  if (!text || [...select.options].some(option => option.value === text)) return;
+  const option = document.createElement("option");
+  option.value = text;
+  option.textContent = text;
+  select.appendChild(option);
+}
+
+function rebuildRecords() {
+  state.records = [...state.curatedRecords, ...state.localRecords];
 }
 
 function getFilteredRecords() {
@@ -1867,6 +2755,7 @@ function appendCell(rowElement, value, className = "") {
   if (!text) cell.classList.add("empty-value");
   if (className) cell.classList.add(className);
   rowElement.appendChild(cell);
+  return cell;
 }
 
 function openDetails(row) {
@@ -1908,12 +2797,20 @@ function renderTable() {
   for (const record of pageRecords) {
     const row = record.source;
     const rowElement = document.createElement("tr");
+    if (record.local) rowElement.classList.add("local-record-row");
 
     for (const column of TABLE_COLUMNS) {
-      appendCell(rowElement, row[column.key], column.className);
+      const cell = appendCell(rowElement, row[column.key], column.className);
+      if (record.local && column.key === "sorbent name") {
+        const badge = document.createElement("span");
+        badge.className = "local-badge";
+        badge.textContent = "Local";
+        cell.appendChild(badge);
+      }
     }
 
     const actionCell = document.createElement("td");
+    actionCell.className = "table-actions";
     const detailsButton = document.createElement("button");
     detailsButton.type = "button";
     detailsButton.className = "details-button";
@@ -1921,6 +2818,23 @@ function renderTable() {
     detailsButton.setAttribute("aria-label", `View all fields for ${row["sorbent name"] || "this sorbent"}`);
     detailsButton.addEventListener("click", () => openDetails(row));
     actionCell.appendChild(detailsButton);
+    if (record.local) {
+      const editButton = document.createElement("button");
+      editButton.type = "button";
+      editButton.className = "details-button";
+      editButton.textContent = "Edit";
+      editButton.setAttribute("aria-label", `Edit local record for ${record.name}`);
+      editButton.addEventListener("click", () => openSubmissionDialog(record.submission, record.localId, "local"));
+      actionCell.appendChild(editButton);
+
+      const sendButton = document.createElement("button");
+      sendButton.type = "button";
+      sendButton.className = "details-button";
+      sendButton.textContent = "Send to curators";
+      sendButton.setAttribute("aria-label", `Prepare an email to the curators for ${record.name}`);
+      sendButton.addEventListener("click", () => openCuratorEmail(record.submission));
+      actionCell.appendChild(sendButton);
+    }
     rowElement.appendChild(actionCell);
     fragment.appendChild(rowElement);
   }
@@ -1941,6 +2855,257 @@ function renderTable() {
     : `Page ${state.currentPage} of ${totalPages}`;
   UI.previousPage.disabled = state.pageSize === Infinity || state.currentPage <= 1;
   UI.nextPage.disabled = state.pageSize === Infinity || state.currentPage >= totalPages;
+}
+
+function createNumericSubmissionControl(field, container) {
+  const row = document.createElement("div");
+  row.className = "submission-number";
+  row.dataset.fieldId = field.id;
+
+  const heading = document.createElement("div");
+  heading.className = "submission-number-heading";
+  const label = document.createElement("label");
+  label.textContent = `${field.label}${field.symbol ? ` (${field.symbol})` : ""}${field.unit ? ` — ${field.unit}` : ""}`;
+  const definition = document.createElement("p");
+  definition.className = "submission-definition";
+  definition.textContent = field.definition;
+  heading.append(label, definition);
+
+  const statusControl = document.createElement("div");
+  statusControl.className = "submission-number-control";
+  const statusLabel = document.createElement("span");
+  statusLabel.textContent = "State";
+  const status = document.createElement("select");
+  status.id = `${field.id}-status`;
+  status.setAttribute("aria-label", `${field.label} state`);
+  for (const [value, text] of [["missing", "Missing / not reported"], ["value", "Value supplied"], ["na", "Not applicable"]]) {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = text;
+    status.appendChild(option);
+  }
+  statusControl.append(statusLabel, status);
+
+  const valueControl = document.createElement("div");
+  valueControl.className = "submission-number-control";
+  const valueLabel = document.createElement("label");
+  valueLabel.htmlFor = `${field.id}-value`;
+  valueLabel.textContent = "Value";
+  const value = document.createElement("input");
+  value.type = "number";
+  value.step = "any";
+  value.id = `${field.id}-value`;
+  value.setAttribute("aria-label", `${field.label} value${field.unit ? ` in ${field.unit}` : ""}`);
+  valueControl.append(valueLabel, value);
+
+  const uncertaintyControl = document.createElement("div");
+  uncertaintyControl.className = "submission-number-control";
+  const uncertaintyLabel = document.createElement("label");
+  uncertaintyLabel.htmlFor = `${field.id}-uncertainty`;
+  uncertaintyLabel.textContent = "Uncertainty";
+  const uncertainty = document.createElement("input");
+  uncertainty.type = "number";
+  uncertainty.step = "any";
+  uncertainty.min = "0";
+  uncertainty.id = `${field.id}-uncertainty`;
+  uncertainty.setAttribute("aria-label", `${field.label} uncertainty${field.unit ? ` in ${field.unit}` : ""}`);
+  uncertaintyControl.append(uncertaintyLabel, uncertainty);
+
+  const updateState = () => {
+    const enabled = status.value === "value";
+    value.disabled = !enabled;
+    uncertainty.disabled = !enabled;
+  };
+  status.addEventListener("change", updateState);
+  row.append(heading, statusControl, valueControl, uncertaintyControl);
+  container.appendChild(row);
+  updateState();
+  return row;
+}
+
+function initializeSubmissionForm() {
+  for (const field of NUMERIC_SUBMISSION_FIELDS.slice(0, 5)) {
+    createNumericSubmissionControl(field, UI.primarySubmissionFields);
+  }
+  for (const field of NUMERIC_SUBMISSION_FIELDS.slice(5)) {
+    createNumericSubmissionControl(field, UI.secondarySubmissionFields);
+  }
+  renderKineticsControl();
+}
+
+function renderKineticsControl(entry = null) {
+  UI.kineticsNumericField.replaceChildren();
+  const definition = KINETICS_FIELD.definitions[UI.kineticsType.value];
+  if (!definition) {
+    UI.kineticsDefinition.textContent = UI.kineticsType.value === "na"
+      ? "Reaction kinetics are explicitly not applicable."
+      : "Choose the reported representation; both are not required.";
+    return;
+  }
+
+  UI.kineticsDefinition.textContent = `${definition.symbol} (${definition.unit}): ${definition.definition}`;
+  const row = createNumericSubmissionControl(
+    { ...KINETICS_FIELD, ...definition },
+    UI.kineticsNumericField
+  );
+  if (entry) setNumericControl(row, entry);
+}
+
+function setNumericControl(row, entry = {}) {
+  const fieldId = row.dataset.fieldId;
+  const status = row.querySelector(`#${fieldId}-status`);
+  const value = row.querySelector(`#${fieldId}-value`);
+  const uncertainty = row.querySelector(`#${fieldId}-uncertainty`);
+  status.value = entry.status ?? "missing";
+  value.value = entry.value ?? "";
+  uncertainty.value = entry.uncertainty ?? "";
+  status.dispatchEvent(new Event("change"));
+}
+
+function readNumericControl(fieldId) {
+  const row = UI.submissionForm.querySelector(`[data-field-id="${fieldId}"]`);
+  if (!row) return { status: UI.kineticsType.value === "na" ? "na" : "missing", value: "", uncertainty: "" };
+  return {
+    status: row.querySelector(`#${fieldId}-status`).value,
+    value: row.querySelector(`#${fieldId}-value`).value,
+    uncertainty: row.querySelector(`#${fieldId}-uncertainty`).value,
+  };
+}
+
+function readSubmissionForm() {
+  const submission = {
+    materialName: UI.materialName.value,
+    captureMethod: UI.captureMethod.value,
+    solvent: UI.solvent.value,
+    kineticsType: UI.kineticsType.value,
+    reactionKinetics: readNumericControl("reactionKinetics"),
+  };
+  for (const field of NUMERIC_SUBMISSION_FIELDS) {
+    submission[field.id] = readNumericControl(field.id);
+  }
+  return submission;
+}
+
+function clearSubmissionValidation() {
+  UI.submissionError.textContent = "";
+  for (const input of UI.submissionForm.querySelectorAll('[aria-invalid="true"]')) {
+    input.setAttribute("aria-invalid", "false");
+  }
+}
+
+function showSubmissionErrors(errors) {
+  clearSubmissionValidation();
+  const messages = Object.values(errors);
+  UI.submissionError.textContent = messages.join(" ");
+  for (const key of Object.keys(errors)) {
+    const [fieldId, part] = key.split(".");
+    const input = fieldId === "materialName"
+      ? UI.materialName
+      : fieldId === "kineticsType"
+        ? UI.kineticsType
+        : document.getElementById(`${fieldId}-${part}`);
+    input?.setAttribute("aria-invalid", "true");
+  }
+}
+
+function resetSubmissionForm() {
+  UI.submissionForm.reset();
+  for (const field of NUMERIC_SUBMISSION_FIELDS) {
+    const row = UI.submissionForm.querySelector(`[data-field-id="${field.id}"]`);
+    if (row) setNumericControl(row);
+  }
+  renderKineticsControl();
+  state.editingLocalId = null;
+  state.currentSubmission = null;
+  state.submissionAdded = false;
+  UI.sendSubmission.disabled = true;
+  UI.submissionStatus.textContent = "";
+  clearSubmissionValidation();
+}
+
+function populateSubmissionForm(submission) {
+  UI.materialName.value = submission.materialName ?? "";
+  UI.captureMethod.value = submission.captureMethod ?? "";
+  UI.solvent.value = submission.solvent ?? "";
+  for (const field of NUMERIC_SUBMISSION_FIELDS) {
+    const row = UI.submissionForm.querySelector(`[data-field-id="${field.id}"]`);
+    if (row) setNumericControl(row, submission[field.id]);
+  }
+  UI.kineticsType.value = submission.kineticsType ?? "";
+  renderKineticsControl(submission.reactionKinetics);
+}
+
+function openSubmissionDialog(submission = null, localId = null, purpose = "share") {
+  resetSubmissionForm();
+  state.editingLocalId = localId;
+  if (submission) populateSubmissionForm(submission);
+  UI.submissionTitle.textContent = localId
+    ? "Update local CO₂ sorbent record"
+    : purpose === "local"
+      ? "Add a local CO₂ sorbent record"
+      : "Share data with curators";
+  UI.addSubmissionLocal.textContent = localId
+    ? "Update local table and plot"
+    : "Add to local table and plot";
+  UI.submissionDialog.showModal();
+  UI.materialName.focus();
+}
+
+function markSubmissionDirty() {
+  if (!state.submissionAdded) return;
+  state.submissionAdded = false;
+  state.currentSubmission = null;
+  UI.sendSubmission.disabled = true;
+  UI.submissionStatus.textContent = "Form changed. Add or update the local record before preparing the email.";
+}
+
+function addSubmissionLocally() {
+  const submission = readSubmissionForm();
+  const errors = validateSubmission(submission);
+  if (Object.keys(errors).length > 0) {
+    showSubmissionErrors(errors);
+    return;
+  }
+
+  clearSubmissionValidation();
+  const source = buildLocalSource(submission);
+  let localId = state.editingLocalId;
+  if (localId === null) {
+    state.localSequence += 1;
+    localId = state.localSequence;
+  }
+  const record = createRecord(source, { local: true, localId, submission });
+  const existingIndex = state.localRecords.findIndex(item => item.localId === localId);
+  if (existingIndex >= 0) state.localRecords.splice(existingIndex, 1, record);
+  else state.localRecords.push(record);
+
+  state.editingLocalId = localId;
+  state.currentSubmission = submission;
+  state.submissionAdded = true;
+  UI.sendSubmission.disabled = false;
+  ensureFilterOption(UI.categoryFilter, source["sorbent category"]);
+  ensureFilterOption(UI.methodFilter, source["capture method"]);
+  rebuildRecords();
+  UI.searchInput.value = source["sorbent name"];
+  UI.categoryFilter.value = "";
+  UI.methodFilter.value = "";
+  renderAll({ resetPage: true });
+
+  const plotted = state.lastPlot?.points.some(point => point.record.localId === localId);
+  UI.submissionStatus.textContent = plotted
+    ? "Added locally and shown on the active plot. This has not been submitted."
+    : "Added locally. It is in the table, but current filters or missing active plot values prevent a point from being shown. This has not been submitted.";
+}
+
+function sendSubmissionToCurators() {
+  if (!state.submissionAdded || !state.currentSubmission) return;
+  openCuratorEmail(state.currentSubmission);
+  UI.submissionStatus.textContent = "Your email client was opened with the data prepared. Review it and send it to complete sharing; nothing was sent automatically.";
+}
+
+function openCuratorEmail(submission) {
+  window.location.href = buildMailto(submission);
+  UI.status.textContent = "Email data prepared. Review and send the message in your email client; nothing was sent automatically.";
 }
 
 let plotRenderFrame = null;
@@ -1967,36 +3132,112 @@ function renderPlot() {
     mappings = getPlotMappings();
   } catch (error) {
     UI.status.textContent = `Plot setting error: ${error.message}`;
-    UI.resultSummary.textContent = `${recordSummary} Fix the highlighted plot setting to update the 3D plot.`;
+    UI.resultSummary.textContent = `${recordSummary} Fix the highlighted plot setting to update the ${state.plotMode.toUpperCase()} plot.`;
     return;
   }
 
   const points = createPlotPoints(state.filteredRecords, mappings);
 
-  const { trace, layout } = makeFigure(points, mappings);
+  const { trace, layout } = makeFigure(points, mappings, state.plotMode);
   Plotly.react(UI.plot, [trace], layout);
+  state.lastPlot = { points, mappings, mode: state.plotMode };
   UI.exportPlot.disabled = false;
 
   UI.status.textContent =
     `${state.filteredRecords.length} matching records; ${points.length} have the values required for this plot.`;
   UI.resultSummary.textContent =
-    `${recordSummary} ${points.length} are represented in the 3D plot with the current settings.`;
+    `${recordSummary} ${points.length} are represented in the ${state.plotMode.toUpperCase()} plot with the current settings.`;
+}
+
+function getExportData() {
+  if (!state.lastPlot) return { rows: [], columns: [] };
+  const computedColumns = ["record provenance", "plot x", "plot y"];
+  if (state.lastPlot.mode === "3d") computedColumns.push("plot z");
+  computedColumns.push("marker size value", "marker color value");
+  const extraSourceFields = [];
+  for (const point of state.lastPlot.points) {
+    for (const key of Object.keys(point.record.source)) {
+      if (!SOURCE_FIELDS.includes(key) && !extraSourceFields.includes(key)) extraSourceFields.push(key);
+    }
+  }
+  const columns = [...SOURCE_FIELDS, ...extraSourceFields, ...computedColumns];
+  const rows = state.lastPlot.points.map(point => ({
+    ...point.record.source,
+    "record provenance": point.record.local ? "local" : "curated",
+    "plot x": point.x,
+    "plot y": point.y,
+    ...(state.lastPlot.mode === "3d" ? { "plot z": point.z } : {}),
+    "marker size value": point.size,
+    "marker color value": point.color,
+  }));
+  return { rows, columns };
+}
+
+function downloadText(text, filename, type) {
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(new Blob([text], { type }));
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
 async function exportPlot() {
   const button = UI.exportPlot;
   const originalLabel = button.textContent;
   const plotSize = getPlotSize();
+  const format = UI.exportFormat.value;
   button.disabled = true;
   button.textContent = "Exporting…";
 
   try {
-    await Plotly.downloadImage(UI.plot, {
-      format: "svg",
-      filename: "co2-sorbents-plot",
-      width: plotSize.width,
-      height: plotSize.height,
-    });
+    if (format === "png" || format === "svg") {
+      const width = format === "png" ? 1800 : plotSize.width;
+      const height = format === "png"
+        ? (state.plotMode === "3d" ? 1800 : 1400)
+        : plotSize.height;
+      await Plotly.downloadImage(UI.plot, {
+        format,
+        filename: `co2-sorbents-${state.plotMode}-plot`,
+        width,
+        height,
+        scale: format === "png" ? 2 : 1,
+      });
+    } else {
+      const { rows, columns } = getExportData();
+      if (format === "csv") {
+        downloadText(
+          serializeCSV(rows, columns),
+          `co2-sorbents-${state.plotMode}-data.csv`,
+          "text/csv;charset=utf-8"
+        );
+      } else {
+        const plainMappings = Object.fromEntries(
+          Object.entries(state.lastPlot.mappings)
+            .filter(([name]) => MAPPING_NAMES.includes(name))
+            .map(([name, mapping]) => [name, {
+              expression: mapping.expression,
+              title: mapping.title || mapping.expression,
+              scale: mapping.scale,
+              min: mapping.min,
+              max: mapping.max,
+            }])
+        );
+        const script = buildPythonScript({
+          rows,
+          columns,
+          config: {
+            mode: state.lastPlot.mode,
+            mappings: plainMappings,
+            palette: UI.colorScale.value,
+            userVariables: state.lastPlot.mappings.userVariables,
+          },
+        });
+        downloadText(script, `co2-sorbents-${state.plotMode}-plot.py`, "text/x-python;charset=utf-8");
+      }
+    }
   } catch (error) {
     UI.status.textContent = "Could not export the plot: " + error.message;
     console.error(error);
@@ -2034,9 +3275,10 @@ async function loadData() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const text = await response.text();
-    state.records = parseCSV(text)
+    state.curatedRecords = parseCSV(text)
       .filter(row => row["sorbent name"]?.trim())
       .map(createRecord);
+    rebuildRecords();
 
     initializeFilters();
     renderTableHeader();
@@ -2083,6 +3325,7 @@ UI.pageSize.addEventListener("change", event => {
   state.currentPage = 1;
   renderTable();
 });
+UI.plotMode.addEventListener("change", event => setPlotMode(event.target.value));
 for (const mappingName of MAPPING_NAMES) {
   const controls = MAPPING_CONTROLS[mappingName];
   controls.expression.addEventListener("input", schedulePlotRender);
@@ -2102,9 +3345,22 @@ UI.closeDialog.addEventListener("click", () => {
 UI.detailDialog.addEventListener("click", event => {
   if (event.target === event.currentTarget) event.currentTarget.close();
 });
+UI.addLocalRecord.addEventListener("click", () => openSubmissionDialog(null, null, "local"));
+UI.shareData.addEventListener("click", () => openSubmissionDialog(null, null, "share"));
+UI.closeSubmission.addEventListener("click", () => UI.submissionDialog.close());
+UI.resetSubmission.addEventListener("click", resetSubmissionForm);
+UI.addSubmissionLocal.addEventListener("click", addSubmissionLocally);
+UI.sendSubmission.addEventListener("click", sendSubmissionToCurators);
+UI.kineticsType.addEventListener("change", () => renderKineticsControl());
+UI.submissionForm.addEventListener("input", markSubmissionDirty);
+UI.submissionForm.addEventListener("change", markSubmissionDirty);
+UI.submissionDialog.addEventListener("click", event => {
+  if (event.target === event.currentTarget) event.currentTarget.close();
+});
 window.addEventListener("resize", schedulePlotResize);
 
 initializePlotControls();
+initializeSubmissionForm();
 loadData();
 </script>
 </body>
