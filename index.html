@@ -3086,7 +3086,7 @@ function addSubmissionLocally() {
   ensureFilterOption(UI.categoryFilter, source["sorbent category"]);
   ensureFilterOption(UI.methodFilter, source["capture method"]);
   rebuildRecords();
-  UI.searchInput.value = source["sorbent name"];
+  UI.searchInput.value = "";
   UI.categoryFilter.value = "";
   UI.methodFilter.value = "";
   renderAll({ resetPage: true });
